@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ads Reports · RegisTeam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#16203A; --muted:#6B7590; --line:#E4E8F0;
+  --navy:#16203A; --accent:#2F6FED; --accent-soft:#E9F0FE;
+  --good:#16A06A; --good-soft:#E3F6EE; --bad:#D9434B; --bad-soft:#FCE8E9;
+  --side:#111A30; --side-ink:#C9D1E4; --side-hover:#1C2744;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+input{font:inherit}
+a{color:var(--accent)}
+
+/* ---------- layout ---------- */
+.app{display:flex;min-height:100vh}
+.side{width:264px;flex:0 0 264px;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:20px 18px 14px;display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.2px}
+.brand .logo{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;font-size:14px}
+.brand small{display:block;font-weight:500;color:#7F8AA8;font-size:11px;letter-spacing:0}
+.side .search{margin:4px 14px 10px;background:#1A2440;border:1px solid #26314F;border-radius:9px;padding:8px 10px;color:#fff;width:calc(100% - 28px)}
+.side .search::placeholder{color:#6F7A98}
+.plist{flex:1;overflow:auto;padding:0 8px}
+.pitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:var(--side-ink);cursor:pointer;user-select:none}
+.pitem:hover{background:var(--side-hover)}
+.pitem.active{background:#24315A;color:#fff}
+.av{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:0 0 26px}
+.pitem .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side .empty{padding:10px 18px;color:#6F7A98;font-size:13px}
+.side-foot{padding:12px 14px 16px;border-top:1px solid #1E2946;display:flex;flex-direction:column;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 14px;font-weight:600;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.btn:hover{border-color:#C8D0DF}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#255FD6}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink);background:#EDF0F6}
+.btn.danger{color:var(--bad)}
+.side .btn{width:100%;justify-content:center}
+.side .btn.dark{background:#1A2440;border-color:#26314F;color:var(--side-ink)}
+.side .btn.dark:hover{background:var(--side-hover)}
+.side .row2{display:flex;gap:8px}
+.main{flex:1;min-width:0}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 28px 60px}
+
+/* ---------- report ---------- */
+.rhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.rhead h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.4px}
+.rhead .sub{color:var(--muted);margin-top:4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{background:none;border:0;padding:10px 14px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.kpi .lb{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:6px 0 4px}
+.kpi .d{font-size:12px;font-weight:600;color:var(--muted)}
+.d.good{color:var(--good)} .d.bad{color:var(--bad)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.card h3{margin:0 0 14px;font-size:14px;font-weight:700}
+.card h3 small{color:var(--muted);font-weight:500;margin-left:6px}
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+.grid2 .card{margin-bottom:0;min-width:0}
+.main,.card,.tblwrap{min-width:0;max-width:100%}
+.grid2+.card,.grid2+.grid2{margin-top:16px}
+.chart{position:relative;height:280px}
+.chart.sm{height:220px}
+.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.ba .it{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ba .lb{font-size:12px;color:var(--muted);font-weight:600}
+.ba .vals{display:flex;white-space:nowrap;align-items:baseline;gap:8px;margin-top:6px}
+.ba .before{color:var(--muted);font-size:15px;text-decoration:line-through;text-decoration-color:#B9C0D0}
+.ba .after{font-size:22px;font-weight:800}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px;margin-left:auto}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.neu{background:#EEF0F5;color:var(--muted)}
+.banner{background:linear-gradient(90deg,#16203A,#24356B);color:#fff;border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
+.banner .t{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#9FB2E8;font-weight:700}
+.banner .h{font-size:18px;font-weight:700;margin:4px 0 14px}
+.banner .ba .it{border-color:#33467E;background:rgba(255,255,255,.04)}
+.banner .ba .lb{color:#AFBBDA}
+.banner .ba .before{color:#8E9BC0}
+.camp{display:flex;flex-direction:column;gap:12px}
+.camp .r{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.camp .n{font-weight:600}
+.camp .num{font-weight:700;text-align:right}
+.camp .bar{grid-column:1/-1;height:7px;background:#EEF1F7;border-radius:6px;overflow:hidden}
+.camp .bar i{display:block;height:100%;border-radius:6px}
+.camp .meta{grid-column:1/-1;font-size:12px;color:var(--muted)}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tblwrap{overflow:auto}
+.tbl th{position:sticky;top:0;background:#F7F8FB;text-align:right;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{padding:8px 10px;border-bottom:1px solid #EEF1F6;text-align:right;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl tr.mk td{background:#F1F6FF;color:var(--accent);font-weight:700;text-align:left;font-size:12px}
+.tbl td.b{font-weight:700}
+.note{color:var(--muted);font-size:12px}
+.frame{width:100%;height:72vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
+.state{background:var(--panel);border:1px dashed #CBD2E1;border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted)}
+.state h2{color:var(--ink);margin:0 0 6px;font-size:18px}
+.spin{width:28px;height:28px;border:3px solid #DCE3F0;border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;margin:0 auto 12px}
+@keyframes s{to{transform:rotate(360deg)}}
+.foot{color:var(--muted);font-size:12px;margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.detected{font-size:12px;color:var(--muted);line-height:1.7}
+.detected code{background:#F0F3F9;border-radius:5px;padding:1px 6px;color:var(--ink)}
+
+/* ---------- modal & toast ---------- */
+.modal{position:fixed;inset:0;background:rgba(15,22,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.on{display:flex}
+.dlg{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:22px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.dlg h2{margin:0 0 4px;font-size:18px}
+.dlg p{margin:0 0 16px;color:var(--muted);font-size:13px}
+.dlg label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.dlg input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+.dlg input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.dlg .err{color:var(--bad);font-size:12px;margin-top:8px;min-height:16px}
+.dlg .bt{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:600}
+.toast.on{opacity:1;transform:translateX(-50%)}
+
+/* client mode */
+.client .side{display:none}
+.client .wrap{max-width:1120px}
+.by{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:14px}
+.by .logo{width:20px;height:20px;border-radius:6px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800}
+
+@media (max-width:900px){
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .app{flex-direction:column}
+  .side{width:100%;flex:none;height:auto;position:relative}
+  .plist{max-height:220px}
+  .wrap{padding:18px 16px 40px}
+  .rhead h1{font-size:22px}
+}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">R</div><div>RegisTeam<small>Google Ads звіти</small></div></div>
+    <input class="search" id="q" placeholder="Пошук проєкту…">
+    <div class="plist" id="plist"></div>
+    <div class="side-foot">
+      <button class="btn primary" id="addBtn">＋ Новий проєкт</button>
+      <div class="row2">
+        <button class="btn dark" id="expBtn" title="Зберегти список проєктів у файл">Експорт</button>
+        <button class="btn dark" id="impBtn" title="Завантажити список проєктів з файлу">Імпорт</button>
+      </div>
+      <input type="file" id="impFile" accept=".json" hidden>
+    </div>
+  </aside>
+  <main class="main"><div class="wrap" id="view"></div></main>
+</div>
+
+<div class="modal" id="modal">
+  <div class="dlg">
+    <h2 id="mTitle">Новий проєкт</h2>
+    <p>Таблиця має бути відкрита для всіх, у кого є посилання (з правом редагування, якщо клієнт має вносити зміни).</p>
+    <label for="fName">Назва проєкту</label>
+    <input id="fName" placeholder="Напр. ezyvision">
+    <label for="fUrl">Посилання на Google-таблицю</label>
+    <input id="fUrl" placeholder="https://docs.google.com/spreadsheets/d/…/edit?gid=0">
+    <div class="err" id="fErr"></div>
+    <div class="bt">
+      <button class="btn ghost" id="mCancel">Скасувати</button>
+      <button class="btn primary" id="mSave">Створити звіт</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   Storage (admin's browser) — projects list
+   ===================================================================== */
+const LS_KEY = 'rt_ads_projects_v1';
+const store = {
+  get(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } },
+  set(v){ try{ localStorage.setItem(LS_KEY, JSON.stringify(v)); }catch(e){} }
+};
+let projects = store.get();
+let currentId = null;
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const PALETTE = ['#2F6FED','#16203A','#8AAEF7','#16A06A','#F2A93B','#9B6CF0','#E76F8F','#29B6C9','#B0B8C9'];
+const avColor = s => { let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))>>>0; return ['#2F6FED','#16A06A','#F2A93B','#9B6CF0','#E76F8F','#29B6C9','#E2733A'][h%7]; };
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),2200); }
+function b64e(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+function b64d(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; return JSON.parse(decodeURIComponent(escape(atob(s)))); }
+function parseSheetUrl(u){
+  u = (u||'').trim();
+  const m = u.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
+  if(!m) return null;
+  const g = u.match(/[#&?]gid=(\d+)/);
+  return { id:m[1], gid: g ? g[1] : '0' };
+}
+const sheetEditUrl = p => `https://docs.google.com/spreadsheets/d/${p.id}/edit#gid=${p.gid}`;
+
+/* =====================================================================
+   Fetch Google Sheet as CSV (sheet must be shared "anyone with link")
+   ===================================================================== */
+async function fetchSheet(p){
+  const urls = [
+    `https://docs.google.com/spreadsheets/d/${p.id}/export?format=csv&gid=${p.gid}`,
+    `https://docs.google.com/spreadsheets/d/${p.id}/gviz/tq?tqx=out:csv&headers=0&gid=${p.gid}`
+  ];
+  let lastErr;
+  for(const u of urls){
+    try{
+      const r = await fetch(u, {cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const t = await r.text();
+      if(/^\s*<!doctype html|<html/i.test(t)) throw new Error('not shared');
+      return parseCSV(t);
+    }catch(e){ lastErr = e; }
+  }
+  throw lastErr || new Error('load failed');
+}
+function parseCSV(t){
+  const rows=[]; let row=[], cur='', q=false;
+  for(let i=0;i<t.length;i++){
+    const c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(cur); cur=''; }
+    else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+    else if(c!=='\r') cur+=c;
+  }
+  if(cur!=='' || row.length){ row.push(cur); rows.push(row); }
+  return rows.map(r=>r.map(c=>c.replace(/\s+/g,' ').trim()));
+}
+
+/* =====================================================================
+   Smart structure detection — works for differently built tables
+   ===================================================================== */
+function makeNum(rows){
+  // Detect decimal comma (e.g. "1237,15") anywhere in the sheet
+  const flat = rows.flat();
+  const commaDec = flat.some(c => /^[^\d-]*-?\d+,\d{1,2}\s*[^\d]*$/.test(c));
+  return function num(s){
+    if(s==null) return null;
+    s=String(s).trim(); if(!s) return null;
+    if(/^\d{1,2}[./]\d{1,2}[./]\d{2,4}$/.test(s)) return null;           // a date
+    const pct = s.includes('%');
+    let neg = /^\(.*\)$/.test(s) || /^-/.test(s.replace(/^[^\d-]+/,''));
+    let c = s.replace(/[\s ]/g,'').replace(/^[^\d.,-]+|[^\d.,]+$/g,'').replace(/^-/,'');
+    if(!/^[\d.,]+$/.test(c) || !/\d/.test(c)) return null;
+    const lc=c.lastIndexOf(','), ld=c.lastIndexOf('.');
+    const nComma=(c.match(/,/g)||[]).length, nDot=(c.match(/\./g)||[]).length;
+    if(lc>-1 && ld>-1){ c = lc>ld ? c.replace(/\./g,'').replace(',','.') : c.replace(/,/g,''); }
+    else if(lc>-1){ c = (nComma===1 && (commaDec || c.length-lc-1!==3)) ? c.replace(',','.') : c.replace(/,/g,''); }
+    else if(nDot>1){ c = c.replace(/\./g,''); }
+    let v = parseFloat(c); if(isNaN(v)) return null;
+    if(neg) v=-v; if(pct) v=v/100;
+    return v;
+  };
+}
+
+const RX = {
+  ctr:   /\bctr\b/i,
+  cpc:   /(avr|avg|aver|average|сер)\W*\.?\s*(cost|cpc)\b|\bcpc\b|cost per click|ціна\s*кліку|вартість\s*кліку|цена\s*клика/i,
+  cpa:   /\bcpa\b|\bcpl\b|cost\s*(per|\/)\s*(conv|lead|result)|conv\w*\s*(price|cost)|(price|cost|ціна|вартість|цена)\s*(за|per|\/)?\s*(конв|conv|лід|лид|lead)|(average|сер\w*).*(conv|конв)/i,
+  roas:  /\broas\b/i,
+  value: /revenue|conv\w*\s*value|дохід|виручка|выручка|дохо/i,
+  impr:  /impr|показ/i,
+  clicks:/click|клік|клик|переход/i,
+  cost:  /cost|spend|витрат|расход|бюджет|затрат|spent/i,
+  total: /total|всього|усього|разом|итого|загал|sum\b/i,
+  conv:  /conv|конв|lead|лід|лид|\bcall|дзвін|звон|form|форм|purchase|покуп|продаж|sale|заявк|order|замов/i,
+};
+
+function analyze(rows){
+  const num = makeNum(rows);
+  rows = rows.map(r=>r.slice());
+  const W = Math.max(...rows.map(r=>r.length));
+  rows.forEach(r=>{ while(r.length<W) r.push(''); });
+  const isNum = c => num(c)!=null;
+  const numCount = r => r.filter(isNum).length;
+  const textCount = r => r.filter(c=>c && !isNum(c)).length;
+
+  // 1) header row = a row with >=3 text cells followed (soon) by a row with >=3 numbers
+  let h=-1;
+  for(let i=0;i<rows.length && h<0;i++){
+    if(textCount(rows[i])<3) continue;
+    for(let j=i+1;j<Math.min(rows.length,i+5);j++){
+      if(numCount(rows[j])>=3){ h=i; break; }
+      if(textCount(rows[j])>=3) break;
+    }
+  }
+  if(h<0) throw new Error('Не вдалося знайти рядок із заголовками колонок.');
+  const header = rows[h];
+  // group row above (merged cells → forward-fill)
+  let group = new Array(W).fill('');
+  if(h>0 && rows[h-1].some(Boolean)){ let last=''; group = rows[h-1].map(c=>(last = c || last)); }
+
+  const body = rows.slice(h+1);
+  // 2) period column = first column whose cells are mostly text
+  let pc=0, best=-1;
+  for(let c=0;c<W;c++){
+    const vals = body.map(r=>r[c]).filter(Boolean);
+    if(!vals.length) continue;
+    const share = vals.filter(v=>!isNum(v)).length/vals.length;
+    if(share>0.6){ pc=c; break; }
+    if(share>best){ best=share; pc=c; }
+  }
+
+  // 3) classify columns
+  const cols = [];
+  for(let c=0;c<W;c++){
+    if(c===pc) continue;
+    const hd = header[c] || '';
+    const g = group[c] || '';
+    const hasData = body.some(r=>isNum(r[c]));
+    if(!hasData && !hd) continue;
+    let role='other';
+    if(RX.ctr.test(hd)) role='ctr';
+    else if(RX.cpc.test(hd)) role='cpc';
+    else if(RX.cpa.test(hd)) role='cpa';
+    else if(RX.roas.test(hd)) role='roas';
+    else if(RX.value.test(hd)) role='value';
+    else if(RX.impr.test(hd)) role='impr';
+    else if(RX.clicks.test(hd)) role='clicks';
+    else if(RX.cost.test(hd)) role='cost';
+    else if(RX.total.test(hd)) role='total';
+    else if(RX.conv.test(hd) || RX.conv.test(g)) role='part';
+    cols.push({c, name: hd || ('Column '+(c+1)), role, group:g});
+  }
+  // keep only first column per single role
+  const seen = {};
+  cols.forEach(o=>{ if(o.role!=='part' && o.role!=='other'){ if(seen[o.role]) o.role='other'; else seen[o.role]=1; } });
+  // "Conversions" alone (no breakdown, no total) => total
+  const parts = cols.filter(o=>o.role==='part');
+  if(!seen.total && parts.length===1){ parts[0].role='total'; seen.total=1; }
+
+  const curM = (header.join(' ')+' '+group.join(' ')).match(/NZ\$|AU\$|US\$|CA\$|A\$|\$|€|£|₴|zł|грн|USD|EUR|GBP|UAH|NZD|AUD|CAD|PLN/);
+  const currency = curM ? curM[0] : '';
+
+  // 4) rows: data vs markers
+  const metricCols = cols.map(o=>o.c);
+  const data=[]; let pending=[];
+  for(const r of body){
+    const label = r[pc] || '';
+    const nums = metricCols.filter(c=>isNum(r[c])).length;
+    const texts = r.filter((x,i)=>x && !isNum(x) && i!==pc);
+    if(!nums){
+      const t = (label || texts[0] || '').trim();
+      if(t && r.filter(Boolean).length<=2) pending.push(t);
+      continue;
+    }
+    if(/^(total|разом|всього|усього|итого|average|сер|avg)/i.test(label)) continue;
+    const row = { label: label || '—', markers: pending, v:{}, parts:{} };
+    pending = [];
+    cols.forEach(o=>{
+      const val = num(r[o.c]);
+      if(o.role==='part') row.parts[o.name] = val ?? 0;
+      else if(o.role==='other') row.v['_'+o.name] = val;
+      else row.v[o.role] = val;
+    });
+    data.push(row);
+  }
+  // drop trailing rows that have no spend and no conversions (unfilled weeks)
+  while(data.length && !data[data.length-1].v.cost && !data[data.length-1].v.total && !Object.values(data[data.length-1].parts).some(Boolean)) data.pop();
+  if(!data.length) throw new Error('У таблиці не знайдено рядків з даними.');
+
+  // 5) derived metrics
+  const partNames = cols.filter(o=>o.role==='part').map(o=>o.name);
+  data.forEach(d=>{
+    const v=d.v;
+    const ps = Object.values(d.parts).reduce((a,b)=>a+(b||0),0);
+    v.conv = v.total ?? (partNames.length ? ps : null);
+    if(v.cpa==null && v.cost!=null && v.conv) v.cpa = v.cost/v.conv;
+    if(v.cpc==null && v.cost!=null && v.clicks) v.cpc = v.cost/v.clicks;
+    if(v.ctr==null && v.clicks!=null && v.impr) v.ctr = v.clicks/v.impr;
+    else if(v.ctr!=null && v.ctr>1) v.ctr = v.ctr/100;
+    if(v.roas==null && v.value!=null && v.cost) v.roas = v.value/v.cost;
+  });
+  const others = cols.filter(o=>o.role==='other' && data.some(d=>d.v['_'+o.name]!=null)).map(o=>o.name);
+  return { data, partNames, others, currency, cols, header, periodName: header[pc] || 'Period' };
+}
+
+/* =====================================================================
+   Formatting
+   ===================================================================== */
+const METRICS = {
+  conv:  {label:'Conversions', fmt:'int', better:'up'},
+  cpa:   {label:'Cost / conversion', fmt:'money2', better:'down'},
+  cost:  {label:'Spend', fmt:'money0', better:'none'},
+  clicks:{label:'Clicks', fmt:'int', better:'up'},
+  impr:  {label:'Impressions', fmt:'int', better:'up'},
+  cpc:   {label:'Avg. CPC', fmt:'money2', better:'down'},
+  ctr:   {label:'CTR', fmt:'pct', better:'up'},
+  value: {label:'Conv. value', fmt:'money0', better:'up'},
+  roas:  {label:'ROAS', fmt:'x', better:'up'},
+};
+function fmt(v, kind, cur){
+  if(v==null || isNaN(v)) return '—';
+  const nf = (d)=> v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  switch(kind){
+    case 'int': return Math.round(v).toLocaleString('en-US');
+    case 'money0': return (cur?cur+' ':'')+nf(0);
+    case 'money2': return (cur?cur+' ':'')+nf(2);
+    case 'pct': return (v*100).toFixed(2)+'%';
+    case 'x': return v.toFixed(2)+'×';
+    default: return nf(Math.abs(v)<10?2:0);
+  }
+}
+function delta(cur, prev, better){
+  if(cur==null || prev==null || !prev) return {txt:'no comparison', cls:''};
+  const ch = cur/prev-1;
+  const arrow = ch>0 ? '▲' : ch<0 ? '▼' : '•';
+  let cls='';
+  if(better==='up') cls = ch>0?'good':ch<0?'bad':'';
+  if(better==='down') cls = ch<0?'good':ch>0?'bad':'';
+  return {txt:`${arrow} ${Math.abs(ch*100).toFixed(1)}% vs prev. week`, cls, ch};
+}
+const avg = arr => { const a=arr.filter(x=>x!=null && !isNaN(x)); return a.length ? a.reduce((s,x)=>s+x,0)/a.length : null; };
+
+/* =====================================================================
+   Render report
+   ===================================================================== */
+let charts=[];
+function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[]; }
+
+async function renderReport(p, mode){
+  destroyCharts();
+  const view = $('#view');
+  const head = `
+    ${mode==='client' ? `<div class="by"><div class="logo">R</div>Prepared by RegisTeam</div>` : ''}
+    <div class="rhead">
+      <div><h1>${esc(p.name)}</h1><div class="sub" id="subline">Google Ads · weekly performance report</div></div>
+      <div class="actions">
+        ${mode==='admin' ? `
+          <button class="btn primary" id="copyLink">🔗 Копіювати лінк для клієнта</button>
+          <button class="btn" id="openClient">Відкрити як клієнт</button>
+          <button class="btn ghost" id="editP">Редагувати</button>
+          <button class="btn ghost danger" id="delP">Видалити</button>` : `
+          <button class="btn" id="refresh">↻ Refresh</button>`}
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-t="report">${mode==='client'?'Report':'Звіт'}</button>
+      <button class="tab" data-t="data">${mode==='client'?'Edit data':'Таблиця (редагування)'}</button>
+    </div>
+    <div id="tabBody"></div>`;
+  view.innerHTML = head;
+
+  if(mode==='admin'){
+    $('#copyLink').onclick = ()=>copyClientLink(p);
+    $('#openClient').onclick = ()=>window.open(clientLink(p),'_blank');
+    $('#editP').onclick = ()=>openModal(p);
+    $('#delP').onclick = ()=>{ if(confirm(`Видалити проєкт «${p.name}» зі списку? Таблиця в Google не зміниться.`)){ projects=projects.filter(x=>x.uid!==p.uid); store.set(projects); currentId=projects[0]?.uid||null; renderSide(); route(); } };
+  } else {
+    $('#refresh').onclick = ()=>showTab('report');
+  }
+  view.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
+
+  async function showTab(t){
+    view.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
+    destroyCharts();
+    const body = $('#tabBody');
+    if(t==='data'){
+      body.innerHTML = `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="note">${mode==='client' ? 'Changes you make here are saved to the Google Sheet and appear in the report after you switch back to “Report”.' : 'Зміни зберігаються прямо в Google-таблиці. Поверніться на «Звіт» — він оновиться.'}</div>
+          <a class="btn" href="${sheetEditUrl(p)}" target="_blank" rel="noopener">${mode==='client'?'Open in Google Sheets ↗':'Відкрити в Google Sheets ↗'}</a>
+        </div>
+        <iframe class="frame" src="https://docs.google.com/spreadsheets/d/${p.id}/edit?rm=minimal#gid=${p.gid}" title="Sheet"></iframe>`;
+      return;
+    }
+    body.innerHTML = `<div class="state"><div class="spin"></div>${mode==='client'?'Loading the latest data…':'Завантажую дані з таблиці…'}</div>`;
+    let A;
+    try{ A = analyze(await fetchSheet(p)); }
+    catch(e){
+      body.innerHTML = `<div class="state"><h2>${mode==='client'?'Could not load the report':'Не вдалося завантажити таблицю'}</h2>
+        ${mode==='client' ? 'Please try again in a minute.' :
+          `Перевірте, що таблиця відкрита «Усі, хто має посилання», і що в лінку правильна вкладка (gid).<br><span class="note">${esc(e.message)}</span>`}</div>`;
+      return;
+    }
+    drawReport(A, p, mode, body);
+  }
+  showTab('report');
+}
+
+function drawReport(A, p, mode, body){
+  const {data, partNames, currency:cur} = A;
+  const last = data[data.length-1], prev = data[data.length-2];
+  $('#subline').innerHTML = `Google Ads · weekly report · ${esc(data[0].label)} — ${esc(last.label)}`;
+
+  // KPI cards
+  const order = ['conv','cpa','cost','clicks','cpc','ctr','impr','value','roas'];
+  const avail = order.filter(k=>data.some(d=>d.v[k]!=null));
+  const kpis = avail.slice(0,8).map(k=>{
+    const m=METRICS[k], d=delta(last.v[k], prev?.v[k], m.better);
+    return `<div class="kpi"><div class="lb">${m.label}</div><div class="v">${fmt(last.v[k], m.fmt, cur)}</div><div class="d ${d.cls}">${d.txt}</div></div>`;
+  }).join('');
+
+  // Before / after marker
+  let banner='';
+  const mi = data.findIndex(d=>d.markers.length);
+  if(mi>0){
+    const before=data.slice(0,mi), after=data.slice(mi);
+    const items = ['conv','cpa','clicks','cpc','ctr','roas'].filter(k=>avail.includes(k)).slice(0,4).map(k=>{
+      const m=METRICS[k], b=avg(before.map(d=>d.v[k])), a=avg(after.map(d=>d.v[k]));
+      const d=delta(a,b,m.better);
+      const pc = d.ch==null?'neu':(d.cls||'neu');
+      return `<div class="it"><div class="lb">${m.label}${['conv','clicks'].includes(k)?' / week':''}</div>
+        <div class="vals"><span class="before">${fmt(b,m.fmt,'')}</span><span class="after">${fmt(a,m.fmt,'')}</span>
+        <span class="pill ${pc}">${d.ch==null?'—':(d.ch>0?'+':'')+(d.ch*100).toFixed(0)+'%'}</span></div></div>`;
+    }).join('');
+    banner = `<div class="banner"><div class="t">Before vs. after · weekly average</div>
+      <div class="h">${esc(data[mi].markers[0])} <span style="color:#9FB2E8;font-weight:500">— from ${esc(data[mi].label)} (${after.length} wk vs ${before.length} wk before)</span></div>
+      <div class="ba">${items}</div></div>`;
+  }
+
+  // Campaign breakdown
+  let camp='';
+  if(partNames.length>1){
+    const tot = partNames.reduce((s,n)=>s+(last.parts[n]||0),0) || 1;
+    camp = partNames.map((n,i)=>{
+      const v=last.parts[n]||0, pv=prev?.parts[n];
+      const d=delta(v,pv,'up');
+      return `<div class="r"><div class="n">${esc(n)}</div><div class="num">${fmt(v,'int')}</div>
+        <div class="bar"><i style="width:${(v/tot*100).toFixed(1)}%;background:${PALETTE[i%PALETTE.length]}"></i></div>
+        <div class="meta">${(v/tot*100).toFixed(0)}% of conversions · <span class="d ${d.cls}">${pv==null?'':d.txt}</span></div></div>`;
+    }).join('');
+  }
+
+  // Table
+  const tcols = ['cost','impr','clicks','ctr','cpc'].filter(k=>avail.includes(k));
+  const tailCols = ['conv','cpa','value','roas'].filter(k=>avail.includes(k));
+  const cpas = data.map(d=>d.v.cpa).filter(x=>x!=null);
+  const mn=Math.min(...cpas), mx=Math.max(...cpas);
+  const heat = v => { if(v==null||mx===mn) return ''; const t=(v-mn)/(mx-mn); return `background:${t<.5?`rgba(22,160,106,${(.5-t)*.35})`:`rgba(217,67,75,${(t-.5)*.35})`}`; };
+  const trs = data.slice().reverse().map(d=>{
+    let mk = d.markers.map(m=>`<tr class="mk"><td colspan="99">◆ ${esc(m)}</td></tr>`).join('');
+    const cells = [
+      `<td>${esc(d.label)}</td>`,
+      ...tcols.map(k=>`<td>${fmt(d.v[k], METRICS[k].fmt, '')}</td>`),
+      ...partNames.map(n=>`<td>${fmt(d.parts[n],'int')}</td>`),
+      ...tailCols.map(k=>`<td class="b" style="${k==='cpa'?heat(d.v.cpa):''}">${fmt(d.v[k], METRICS[k].fmt, '')}</td>`),
+    ].join('');
+    return `<tr>${cells}</tr>`+mk;   // reversed order → marker shown under its week
+  }).join('');
+  const ths = [A.periodName, ...tcols.map(k=>METRICS[k].label+(['cost','cpc'].includes(k)&&cur?`, ${cur}`:'')), ...partNames, ...tailCols.map(k=>METRICS[k].label)].map(t=>`<th>${esc(t)}</th>`).join('');
+
+  body.innerHTML = `
+    <div class="kpis">${kpis}</div>
+    ${banner}
+    <div class="grid2">
+      <div class="card"><h3>Conversions per week${partNames.length>1?'<small>by campaign</small>':''}</h3><div class="chart"><canvas id="c1"></canvas></div></div>
+      ${camp ? `<div class="card"><h3>Last week by campaign<small>${esc(last.label)}</small></h3><div class="camp">${camp}</div></div>`
+             : `<div class="card"><h3>Spend per week</h3><div class="chart"><canvas id="c3"></canvas></div></div>`}
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <div class="card"><h3>Cost per conversion${cur?`<small>${esc(cur)}</small>`:''}</h3><div class="chart sm"><canvas id="c2"></canvas></div></div>
+      <div class="card"><h3>Clicks & spend</h3><div class="chart sm"><canvas id="c4"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:16px"><h3>All weeks</h3><div class="tblwrap"><table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div></div>
+    ${mode==='admin' ? `<div class="card"><h3>Що система розпізнала в таблиці</h3><div class="detected">
+      ${A.cols.map(o=>`<code>${esc(o.name)}</code> → ${({cost:'витрати',impr:'покази',clicks:'кліки',cpc:'ціна кліку',ctr:'CTR',cpa:'ціна конверсії',total:'всього конверсій',part:'конверсії (кампанія)',value:'цінність конверсій',roas:'ROAS',other:'інше (не в звіті)'})[o.role]}`).join(' · ')}
+      ${data.some(d=>d.markers.length)?'<br>Позначки: '+data.filter(d=>d.markers.length).map(d=>`<code>${esc(d.markers.join(', '))}</code> перед ${esc(d.label)}`).join(', '):''}
+      <br>Порада: щоб показати «до/після», додайте в таблицю окремий рядок з текстом (напр. «Our optimisation started») перед потрібним тижнем.</div></div>` : ''}
+    <div class="foot"><span>Data source: Google Sheets · updated ${new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</span><span>RegisTeam</span></div>`;
+
+  drawCharts(A);
+}
+
+/* vertical marker line plugin */
+const markerPlugin = {
+  id:'markers',
+  afterDatasetsDraw(chart, args, opts){
+    const idx = opts.idx; if(idx==null || idx<0) return;
+    const {ctx, chartArea:{top,bottom}, scales:{x}} = chart;
+    const px = x.getPixelForValue(idx) - (x.getPixelForValue(1)-x.getPixelForValue(0))/2;
+    ctx.save(); ctx.strokeStyle='#16A06A'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(px,top); ctx.lineTo(px,bottom); ctx.stroke();
+    ctx.setLineDash([]); ctx.fillStyle='#16A06A'; ctx.font='600 11px Inter,sans-serif';
+    ctx.fillText(opts.text||'', px+5, top+12); ctx.restore();
+  }
+};
+function drawCharts(A){
+  if(!window.Chart) return;
+  Chart.defaults.font.family='Inter,system-ui,sans-serif'; Chart.defaults.color='#6B7590';
+  const {data, partNames} = A;
+  const labels = data.map(d=>d.label);
+  const mi = data.findIndex(d=>d.markers.length);
+  const mk = {idx: mi>0?mi:null, text: mi>0 ? data[mi].markers[0] : ''};
+  const grid = {color:'#EEF1F6'}, noGrid={display:false};
+  const base = (extra={}) => ({responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}, markers:mk, tooltip:{backgroundColor:'#16203A',padding:10}},
+    scales:{x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid, beginAtZero:true}}, ...extra});
+
+  const ds = partNames.length>1
+    ? partNames.map((n,i)=>({label:n, data:data.map(d=>d.parts[n]||0), backgroundColor:PALETTE[i%PALETTE.length], borderRadius:3, stack:'s'}))
+    : [{label:'Conversions', data:data.map(d=>d.v.conv), backgroundColor:'#2F6FED', borderRadius:4}];
+  const o1 = base(); o1.scales.x.stacked=true; o1.scales.y.stacked=true;
+  if(partNames.length<=1) o1.plugins.legend.display=false;
+  charts.push(new Chart($('#c1'), {type:'bar', data:{labels, datasets:ds}, options:o1, plugins:[markerPlugin]}));
+
+  const o2 = base(); o2.plugins.legend.display=false; o2.scales.y.beginAtZero=false;
+  charts.push(new Chart($('#c2'), {type:'line', data:{labels, datasets:[{label:'Cost / conversion', data:data.map(d=>d.v.cpa), borderColor:'#2F6FED', backgroundColor:'rgba(47,111,237,.08)', fill:true, tension:.35, pointRadius:2.5, borderWidth:2.5}]}, options:o2, plugins:[markerPlugin]}));
+
+  const o4 = base({scales:{x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid,beginAtZero:true,title:{display:true,text:'Clicks'}}, y1:{position:'right',grid:noGrid,beginAtZero:true,title:{display:true,text:'Spend'}}}});
+  charts.push(new Chart($('#c4'), {type:'bar', data:{labels, datasets:[
+    {label:'Clicks', data:data.map(d=>d.v.clicks), backgroundColor:'#C9D8FB', borderRadius:3, yAxisID:'y'},
+    {label:'Spend', type:'line', data:data.map(d=>d.v.cost), borderColor:'#16203A', pointRadius:0, borderWidth:2, tension:.3, yAxisID:'y1'}]}, options:o4, plugins:[markerPlugin]}));
+
+  const c3=$('#c3');
+  if(c3){ const o3=base(); o3.plugins.legend.display=false;
+    charts.push(new Chart(c3,{type:'bar',data:{labels,datasets:[{label:'Spend',data:data.map(d=>d.v.cost),backgroundColor:'#16203A',borderRadius:4}]},options:o3,plugins:[markerPlugin]})); }
+}
+
+/* =====================================================================
+   Client link
+   ===================================================================== */
+function clientLink(p){
+  const base = location.href.split('#')[0].split('?')[0];
+  return `${base}?r=${b64e({n:p.name, id:p.id, g:p.gid})}`;
+}
+async function copyClientLink(p){
+  const l = clientLink(p);
+  try{ await navigator.clipboard.writeText(l); toast('Лінк скопійовано — можна надсилати клієнту'); }
+  catch(e){ prompt('Скопіюйте лінк для клієнта:', l); }
+}
+
+/* =====================================================================
+   Sidebar & modal (admin)
+   ===================================================================== */
+function renderSide(){
+  const q = ($('#q').value||'').toLowerCase();
+  const list = projects.filter(p=>p.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
+  $('#plist').innerHTML = list.length ? list.map(p=>`
+    <div class="pitem ${p.uid===currentId?'active':''}" data-u="${p.uid}">
+      <div class="av" style="background:${avColor(p.name)}">${esc(p.name.slice(0,1).toUpperCase())}</div>
+      <div class="nm">${esc(p.name)}</div></div>`).join('')
+    : `<div class="empty">${projects.length?'Нічого не знайдено':'Ще немає проєктів'}</div>`;
+  $('#plist').querySelectorAll('.pitem').forEach(el=>el.onclick=()=>{ currentId=el.dataset.u; renderSide(); route(); });
+}
+let editing=null;
+function openModal(p){
+  editing = p||null;
+  $('#mTitle').textContent = p ? 'Редагувати проєкт' : 'Новий проєкт';
+  $('#mSave').textContent = p ? 'Зберегти' : 'Створити звіт';
+  $('#fName').value = p?.name || '';
+  $('#fUrl').value = p ? sheetEditUrl(p) : '';
+  $('#fErr').textContent='';
+  $('#modal').classList.add('on'); setTimeout(()=>$('#fName').focus(),50);
+}
+function closeModal(){ $('#modal').classList.remove('on'); }
+function saveModal(){
+  const name=$('#fName').value.trim(), s=parseSheetUrl($('#fUrl').value);
+  if(!name){ $('#fErr').textContent='Вкажіть назву проєкту'; return; }
+  if(!s){ $('#fErr').textContent='Це не схоже на посилання на Google-таблицю'; return; }
+  if(editing){ Object.assign(editing,{name,...s}); currentId=editing.uid; }
+  else { const p={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, ...s}; projects.push(p); currentId=p.uid; }
+  store.set(projects); closeModal(); renderSide(); route();
+}
+
+/* =====================================================================
+   Router
+   ===================================================================== */
+function route(){
+  const params = new URLSearchParams(location.search);
+  const r = params.get('r');
+  if(r){
+    document.getElementById('app').classList.add('client');
+    let p; try{ const o=b64d(r); p={name:o.n, id:o.id, gid:o.g||'0'}; }catch(e){ p=null; }
+    if(!p || !p.id){ $('#view').innerHTML='<div class="state"><h2>Link is not valid</h2>Please ask your account manager for a new link.</div>'; return; }
+    document.title = `${p.name} · Google Ads report`;
+    renderReport(p,'client');
+    return;
+  }
+  const p = projects.find(x=>x.uid===currentId) || projects[0];
+  if(!p){
+    $('#view').innerHTML = `<div class="state" style="margin-top:40px"><h2>Додайте перший проєкт</h2>
+      Натисніть «＋ Новий проєкт», вкажіть назву та лінк на Google-таблицю — звіт сформується автоматично.<br><br>
+      <button class="btn primary" onclick="openModal()">＋ Новий проєкт</button></div>`;
+    return;
+  }
+  currentId = p.uid; renderSide();
+  renderReport(p,'admin');
+}
+
+$('#addBtn').onclick = ()=>openModal();
+$('#mCancel').onclick = closeModal;
+$('#mSave').onclick = saveModal;
+$('#modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+$('#fUrl').addEventListener('keydown', e=>{ if(e.key==='Enter') saveModal(); });
+$('#q').oninput = renderSide;
+$('#expBtn').onclick = ()=>{
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(projects,null,2)],{type:'application/json'}));
+  a.download='projects.json'; a.click();
+};
+$('#impBtn').onclick = ()=>$('#impFile').click();
+$('#impFile').onchange = async e=>{
+  const f=e.target.files[0]; if(!f) return;
+  try{
+    const arr=JSON.parse(await f.text());
+    let added=0;
+    arr.forEach(p=>{ if(p.id && p.name && !projects.some(x=>x.id===p.id && x.gid===p.gid)){ projects.push({uid:p.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,6), name:p.name, id:p.id, gid:p.gid||'0'}); added++; } });
+    store.set(projects); renderSide(); route(); toast(`Додано проєктів: ${added}`);
+  }catch(err){ toast('Не вдалося прочитати файл'); }
+  e.target.value='';
+};
+
+renderSide();
+route();
+
+// expose for testing
+window.__analyze = analyze; window.__parseCSV = parseCSV;
+</script>
+</body>
+</html>
