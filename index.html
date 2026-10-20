@@ -3,154 +3,194 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ads Reports · RegisTeam</title>
+<title>Google Ads Reports · RegisTeam</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#F4F6FA; --panel:#FFFFFF; --ink:#16203A; --muted:#6B7590; --line:#E4E8F0;
-  --navy:#16203A; --accent:#2F6FED; --accent-soft:#E9F0FE;
-  --good:#16A06A; --good-soft:#E3F6EE; --bad:#D9434B; --bad-soft:#FCE8E9;
-  --side:#111A30; --side-ink:#C9D1E4; --side-hover:#1C2744;
-  --radius:14px;
+  /* RegisTeam brand */
+  --coral:#FF7061; --coral-dark:#F0574A; --coral-soft:#FFEFEC; --coral-line:#FFD3CD;
+  --ink:#141416; --muted:#6E6E78; --line:#ECECEF; --bg:#F7F7F8; --panel:#FFFFFF;
+  --char:#1B1B1F; --char-2:#2A2A30; --side-ink:#C8C8D0; --side-hover:#26262C;
+  --good:#1F9D63; --good-soft:#E4F5EC; --bad:#D93A3A; --bad-soft:#FCE7E7;
+  --radius:16px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-button{font:inherit;cursor:pointer}
-input{font:inherit}
-a{color:var(--accent)}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 Montserrat,"Gotham Pro",-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+button,select,input{font:inherit}
+button{cursor:pointer}
+a{color:var(--coral-dark)}
+
+/* wordmark */
+.wm{display:inline-flex;flex-direction:column;line-height:.9;user-select:none}
+.wm b{font-weight:800;font-size:19px;letter-spacing:.5px;color:inherit}
+.wm span{font-weight:700;font-size:8.5px;letter-spacing:6.3px;color:var(--coral);margin-top:3px}
 
 /* ---------- layout ---------- */
 .app{display:flex;min-height:100vh}
-.side{width:264px;flex:0 0 264px;background:var(--side);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
-.brand{padding:20px 18px 14px;display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;letter-spacing:.2px}
-.brand .logo{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;font-size:14px}
-.brand small{display:block;font-weight:500;color:#7F8AA8;font-size:11px;letter-spacing:0}
-.side .search{margin:4px 14px 10px;background:#1A2440;border:1px solid #26314F;border-radius:9px;padding:8px 10px;color:#fff;width:calc(100% - 28px)}
-.side .search::placeholder{color:#6F7A98}
+.side{width:268px;flex:0 0 268px;background:var(--char);color:var(--side-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.brand{padding:20px 18px 14px;color:#fff}
+.brand small{display:block;color:#85858F;font-size:11px;font-weight:500;margin-top:8px}
+.side .search{margin:6px 14px 10px;background:#232328;border:1px solid #303037;border-radius:20px;padding:8px 14px;color:#fff;width:calc(100% - 28px)}
+.side .search::placeholder{color:#75757F}
 .plist{flex:1;overflow:auto;padding:0 8px}
-.pitem{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;color:var(--side-ink);cursor:pointer;user-select:none}
+.pitem{display:flex;align-items:center;gap:10px;padding:8px 8px 8px 10px;border-radius:10px;color:var(--side-ink);cursor:pointer;user-select:none}
 .pitem:hover{background:var(--side-hover)}
-.pitem.active{background:#24315A;color:#fff}
-.av{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:0 0 26px}
-.pitem .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.side .empty{padding:10px 18px;color:#6F7A98;font-size:13px}
-.side-foot{padding:12px 14px 16px;border-top:1px solid #1E2946;display:flex;flex-direction:column;gap:8px}
-.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 14px;font-weight:600;display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-.btn:hover{border-color:#C8D0DF}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
-.btn.primary:hover{background:#255FD6}
+.pitem.active{background:#2E2E35;color:#fff;box-shadow:inset 3px 0 0 var(--coral)}
+.av{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px;flex:0 0 26px}
+.pitem .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pitem .del{opacity:0;border:0;background:transparent;color:#9A9AA4;border-radius:7px;width:26px;height:26px;display:grid;place-items:center;flex:0 0 26px}
+.pitem:hover .del{opacity:1}
+.pitem .del:hover{background:#3A2524;color:var(--coral)}
+.side .empty{padding:10px 18px;color:#75757F;font-size:13px}
+.side-foot{padding:12px 14px 16px;border-top:1px solid #26262C;display:flex;flex-direction:column;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:20px;padding:8px 16px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;text-decoration:none}
+.btn:hover{border-color:#D5D5DB}
+.btn.primary{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn.primary:hover{background:var(--coral-dark);border-color:var(--coral-dark)}
 .btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
-.btn.ghost:hover{color:var(--ink);background:#EDF0F6}
+.btn.ghost:hover{color:var(--ink);background:#EFEFF2}
 .btn.danger{color:var(--bad)}
-.side .btn{width:100%;justify-content:center}
-.side .btn.dark{background:#1A2440;border-color:#26314F;color:var(--side-ink)}
+.side .btn{width:100%}
+.side .btn.dark{background:#232328;border-color:#303037;color:var(--side-ink)}
 .side .btn.dark:hover{background:var(--side-hover)}
 .side .row2{display:flex;gap:8px}
 .main{flex:1;min-width:0}
-.wrap{max-width:1180px;margin:0 auto;padding:26px 28px 60px}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 28px 60px}
 
-/* ---------- report ---------- */
-.rhead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.rhead h1{margin:0;font-size:26px;font-weight:800;letter-spacing:-.4px}
-.rhead .sub{color:var(--muted);margin-top:4px}
+/* ---------- report header ---------- */
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.lang{display:inline-flex;background:#EFEFF2;border-radius:20px;padding:3px}
+.lang button{border:0;background:transparent;border-radius:16px;padding:4px 11px;font-weight:700;font-size:12px;color:var(--muted)}
+.lang button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.rhead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.rhead h1{margin:0;font-size:28px;font-weight:800;letter-spacing:-.5px}
+.rhead .sub{color:var(--muted);margin-top:6px;font-weight:500}
+.rhead .sub b{color:var(--ink)}
 .actions{display:flex;gap:8px;flex-wrap:wrap}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
-.tab{background:none;border:0;padding:10px 14px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px}
-.tab.on{color:var(--ink);border-bottom-color:var(--accent)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
-.kpi .lb{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted)}
-.kpi .v{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:6px 0 4px}
+.tab{background:none;border:0;padding:10px 14px;color:var(--muted);font-weight:700;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--ink);border-bottom-color:var(--coral)}
+
+/* ---------- blocks ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;min-width:0}
+.card h3{margin:0;font-size:15px;font-weight:700}
+.card h3 small{color:var(--muted);font-weight:500;margin-left:6px;font-size:12px}
+.chead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.seg{display:inline-flex;background:#F1F1F3;border-radius:20px;padding:3px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:16px;padding:6px 13px;font-weight:600;font-size:12.5px;color:var(--muted)}
+.seg button.on{background:var(--char);color:#fff}
+.range{font-size:12.5px;color:var(--muted);font-weight:500;margin:-6px 0 14px}
+.range b{color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px}
+.kpi{border:1px solid var(--line);border-radius:14px;padding:13px 15px;position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--coral)}
+.kpi .lb{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:25px;font-weight:800;letter-spacing:-.5px;margin:6px 0 3px}
 .kpi .d{font-size:12px;font-weight:600;color:var(--muted)}
 .d.good{color:var(--good)} .d.bad{color:var(--bad)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
-.card h3{margin:0 0 14px;font-size:14px;font-weight:700}
-.card h3 small{color:var(--muted);font-weight:500;margin-left:6px}
-.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
-.grid2 .card{margin-bottom:0;min-width:0}
-.main,.card,.tblwrap{min-width:0;max-width:100%}
-.grid2+.card,.grid2+.grid2{margin-top:16px}
-.chart{position:relative;height:280px}
-.chart.sm{height:220px}
-.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
-.ba .it{border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.ba .lb{font-size:12px;color:var(--muted);font-weight:600}
-.ba .vals{display:flex;white-space:nowrap;align-items:baseline;gap:8px;margin-top:6px}
-.ba .before{color:var(--muted);font-size:15px;text-decoration:line-through;text-decoration-color:#B9C0D0}
+
+/* sheet-like table */
+.tblwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;max-width:100%}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th,.tbl td{padding:8px 11px;white-space:nowrap;text-align:right;border-bottom:1px solid #F0F0F3}
+.tbl th:first-child,.tbl td:first-child{text-align:left;position:sticky;left:0;background:inherit;z-index:1}
+.tbl thead tr.grp th{background:var(--char);color:#fff;font-size:11px;letter-spacing:.6px;text-transform:uppercase;text-align:center;border-bottom:0;padding:7px 10px}
+.tbl thead tr.grp th.g1{background:var(--coral)}
+.tbl thead tr.grp th.g0{background:var(--char)}
+.tbl thead tr.grp th.empty{background:#fff}
+.tbl thead tr.hd th{background:#FAFAFB;color:var(--ink);font-size:11.5px;font-weight:700;border-bottom:2px solid var(--coral);white-space:normal;min-width:78px;vertical-align:bottom}
+.tbl tbody tr{background:#fff}
+.tbl tbody tr:nth-child(even){background:#FBFBFC}
+.tbl tbody tr:hover{background:#FFF7F5}
+.tbl tr.mk td{background:var(--coral-soft)!important;color:var(--coral-dark);font-weight:700;text-align:left;font-size:12px;border-top:2px solid var(--coral)}
+.tbl tr.last td{background:#FFF4F1!important;font-weight:700}
+.tbl tr.last td:first-child:after{content:attr(data-tag);margin-left:8px;font-size:10px;font-weight:700;color:#fff;background:var(--coral);border-radius:10px;padding:2px 7px;letter-spacing:.3px;text-transform:uppercase}
+.tbl td.b{font-weight:700}
+
+/* before/after */
+.banner{background:linear-gradient(100deg,#1B1B1F,#2D2D35);color:#fff;border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;position:relative;overflow:hidden}
+.banner:after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;border:2px dashed rgba(255,112,97,.45)}
+.banner .t{font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--coral);font-weight:700}
+.banner .h{font-size:18px;font-weight:700;margin:4px 0 14px;position:relative;z-index:1}
+.banner .h span{color:#A9A9B3;font-weight:500}
+.ba{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;position:relative;z-index:1}
+.ba .it{border:1px solid #3A3A43;background:rgba(255,255,255,.03);border-radius:12px;padding:12px 14px}
+.ba .lb{font-size:12px;color:#B5B5BF;font-weight:600}
+.ba .vals{display:flex;align-items:baseline;gap:8px;margin-top:6px;white-space:nowrap}
+.ba .before{color:#8F8F9A;font-size:15px;text-decoration:line-through}
 .ba .after{font-size:22px;font-weight:800}
 .pill{display:inline-block;font-size:12px;font-weight:700;border-radius:20px;padding:2px 9px;margin-left:auto}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.bad{background:var(--bad-soft);color:var(--bad)}
-.pill.neu{background:#EEF0F5;color:var(--muted)}
-.banner{background:linear-gradient(90deg,#16203A,#24356B);color:#fff;border-radius:var(--radius);padding:18px 20px;margin-bottom:16px}
-.banner .t{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:#9FB2E8;font-weight:700}
-.banner .h{font-size:18px;font-weight:700;margin:4px 0 14px}
-.banner .ba .it{border-color:#33467E;background:rgba(255,255,255,.04)}
-.banner .ba .lb{color:#AFBBDA}
-.banner .ba .before{color:#8E9BC0}
-.camp{display:flex;flex-direction:column;gap:12px}
-.camp .r{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
-.camp .n{font-weight:600}
-.camp .num{font-weight:700;text-align:right}
-.camp .bar{grid-column:1/-1;height:7px;background:#EEF1F7;border-radius:6px;overflow:hidden}
-.camp .bar i{display:block;height:100%;border-radius:6px}
-.camp .meta{grid-column:1/-1;font-size:12px;color:var(--muted)}
-.tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tblwrap{overflow:auto}
-.tbl th{position:sticky;top:0;background:#F7F8FB;text-align:right;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-.tbl td{padding:8px 10px;border-bottom:1px solid #EEF1F6;text-align:right;white-space:nowrap}
-.tbl th:first-child,.tbl td:first-child{text-align:left}
-.tbl tr.mk td{background:#F1F6FF;color:var(--accent);font-weight:700;text-align:left;font-size:12px}
-.tbl td.b{font-weight:700}
+.pill.neu{background:#EEEEF1;color:var(--muted)}
+
+/* charts */
+.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+.grid2 .card{margin-bottom:0}
+.chart{position:relative;height:280px}
+.chart.sm{height:230px}
+
+/* compare */
+.cmpctl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.cmpbox{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.cmpbox .lb{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.cmpbox .lb i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.cmpbox .sel{display:flex;gap:6px;align-items:center;flex-wrap:wrap;color:var(--muted);font-size:12.5px}
+.cmpbox select{border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:#fff;color:var(--ink);font-weight:600}
+.cmp{width:100%;border-collapse:collapse;font-size:13.5px}
+.cmp th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:right;padding:8px 10px;border-bottom:1px solid var(--line)}
+.cmp td{padding:9px 10px;border-bottom:1px solid #F0F0F3;text-align:right;white-space:nowrap}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp td.a{font-weight:700}
+.cmp tr.sub td:first-child{padding-left:24px;color:var(--muted)}
+.cmp tr.sec td{background:#FAFAFB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--muted)}
+
 .note{color:var(--muted);font-size:12px}
 .frame{width:100%;height:72vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
-.state{background:var(--panel);border:1px dashed #CBD2E1;border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted)}
+.state{background:var(--panel);border:1px dashed #D7D7DD;border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted)}
 .state h2{color:var(--ink);margin:0 0 6px;font-size:18px}
-.spin{width:28px;height:28px;border:3px solid #DCE3F0;border-top-color:var(--accent);border-radius:50%;animation:s 1s linear infinite;margin:0 auto 12px}
+.spin{width:28px;height:28px;border:3px solid #F1E0DD;border-top-color:var(--coral);border-radius:50%;animation:s 1s linear infinite;margin:0 auto 12px}
 @keyframes s{to{transform:rotate(360deg)}}
-.foot{color:var(--muted);font-size:12px;margin-top:24px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.detected{font-size:12px;color:var(--muted);line-height:1.7}
-.detected code{background:#F0F3F9;border-radius:5px;padding:1px 6px;color:var(--ink)}
+.foot{color:var(--muted);font-size:12px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.detected{font-size:12px;color:var(--muted);line-height:1.8}
+.detected code{background:#F3F3F5;border-radius:5px;padding:1px 6px;color:var(--ink)}
 
-/* ---------- modal & toast ---------- */
-.modal{position:fixed;inset:0;background:rgba(15,22,42,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+/* modal & toast */
+.modal{position:fixed;inset:0;background:rgba(20,20,22,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
 .modal.on{display:flex}
-.dlg{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:22px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.dlg{background:#fff;border-radius:18px;width:100%;max-width:480px;padding:22px 22px 18px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .dlg h2{margin:0 0 4px;font-size:18px}
-.dlg p{margin:0 0 16px;color:var(--muted);font-size:13px}
-.dlg label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.4px}
-.dlg input{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
-.dlg input:focus{outline:2px solid var(--accent-soft);border-color:var(--accent)}
+.dlg p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.dlg label{display:block;font-size:11.5px;font-weight:700;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.4px}
+.dlg input,.dlg select{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+.dlg input:focus,.dlg select:focus{outline:2px solid var(--coral-soft);border-color:var(--coral)}
 .dlg .err{color:var(--bad);font-size:12px;margin-top:8px;min-height:16px}
 .dlg .bt{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:600}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--char);color:#fff;padding:10px 18px;border-radius:20px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:600}
 .toast.on{opacity:1;transform:translateX(-50%)}
 
-/* client mode */
 .client .side{display:none}
-.client .wrap{max-width:1120px}
-.by{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px;font-weight:600;margin-bottom:14px}
-.by .logo{width:20px;height:20px;border-radius:6px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800}
 
-@media (max-width:900px){
-  .grid2{grid-template-columns:1fr}
-}
+@media (max-width:900px){ .grid2{grid-template-columns:1fr} }
 @media (max-width:760px){
   .app{flex-direction:column}
   .side{width:100%;flex:none;height:auto;position:relative}
   .plist{max-height:220px}
-  .wrap{padding:18px 16px 40px}
-  .rhead h1{font-size:22px}
+  .pitem .del{opacity:1}
+  .wrap{padding:16px 16px 40px}
+  .rhead h1{font-size:23px}
+  .cmpctl{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 <div class="app" id="app">
   <aside class="side">
-    <div class="brand"><div class="logo">R</div><div>RegisTeam<small>Google Ads звіти</small></div></div>
+    <div class="brand"><div class="wm"><b>REGIS</b><span>TEAM</span></div><small>Google Ads звіти клієнтів</small></div>
     <input class="search" id="q" placeholder="Пошук проєкту…">
     <div class="plist" id="plist"></div>
     <div class="side-foot">
@@ -168,11 +208,13 @@ a{color:var(--accent)}
 <div class="modal" id="modal">
   <div class="dlg">
     <h2 id="mTitle">Новий проєкт</h2>
-    <p>Таблиця має бути відкрита для всіх, у кого є посилання (з правом редагування, якщо клієнт має вносити зміни).</p>
+    <p>Таблиця має бути відкрита «Усі, хто має посилання» — з правом редагування, якщо клієнт має вносити зміни.</p>
     <label for="fName">Назва проєкту</label>
     <input id="fName" placeholder="Напр. ezyvision">
     <label for="fUrl">Посилання на Google-таблицю</label>
     <input id="fUrl" placeholder="https://docs.google.com/spreadsheets/d/…/edit?gid=0">
+    <label for="fLang">Мова звіту для клієнта</label>
+    <select id="fLang"><option value="en">English</option><option value="uk">Українська</option><option value="ru">Русский</option></select>
     <div class="err" id="fErr"></div>
     <div class="bt">
       <button class="btn ghost" id="mCancel">Скасувати</button>
@@ -184,14 +226,57 @@ a{color:var(--accent)}
 
 <script>
 /* =====================================================================
-   Storage (admin's browser) — projects list
+   Translations (report part)
    ===================================================================== */
-const LS_KEY = 'rt_ads_projects_v1';
-const store = {
-  get(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)) || []; }catch(e){ return []; } },
-  set(v){ try{ localStorage.setItem(LS_KEY, JSON.stringify(v)); }catch(e){} }
+const I18N = {
+  en:{ weekly:'Weekly Google Ads report', reportFor:'Report for the week', preparedBy:'Prepared by', refresh:'Refresh',
+       tabReport:'Report', tabEdit:'Edit data', results:'Results',
+       w1:'Last week', w2:'2 weeks', w3:'3 weeks', w4:'Month',
+       vsPrev:'vs previous period', vs:'vs', noCmp:'no data to compare',
+       conv:'Conversions', cpa:'Cost / conversion', cost:'Spend', clicks:'Clicks', impr:'Impressions', cpc:'Avg. CPC', ctr:'CTR', value:'Conv. value', roas:'ROAS',
+       weeklyData:'Weekly data', lastTag:'last week',
+       beforeAfter:'Before vs. after · weekly average', from:'from', wk:'wk', before:'before', perWeek:' / week',
+       chConv:'Conversions per week', byCamp:'by campaign', chCpa:'Cost per conversion', chClicks:'Clicks & spend',
+       compare:'Compare periods', periodA:'Period', periodB:'Compare to', metric:'Metric', change:'Change', fromW:'from', toW:'to', weeks:'weeks', convByCamp:'Conversions by campaign',
+       editNote:'Changes you make here are saved to the Google Sheet and appear in the report when you switch back to “Report”.',
+       openSheets:'Open in Google Sheets ↗', loading:'Loading the latest data…', loadErr:'Could not load the report', tryAgain:'Please try again in a minute.',
+       updated:'Data source: Google Sheets · updated', badLink:'This link is not valid', askManager:'Please ask your account manager for a new link.' },
+  uk:{ weekly:'Тижневий звіт Google Ads', reportFor:'Звіт за тиждень', preparedBy:'Підготовлено', refresh:'Оновити',
+       tabReport:'Звіт', tabEdit:'Редагувати дані', results:'Результати',
+       w1:'Останній тиждень', w2:'2 тижні', w3:'3 тижні', w4:'Місяць',
+       vsPrev:'до попереднього періоду', vs:'порівняно з', noCmp:'немає даних для порівняння',
+       conv:'Конверсії', cpa:'Ціна конверсії', cost:'Витрати', clicks:'Кліки', impr:'Покази', cpc:'Сер. ціна кліку', ctr:'CTR', value:'Цінність конверсій', roas:'ROAS',
+       weeklyData:'Дані по тижнях', lastTag:'останній тиждень',
+       beforeAfter:'До і після · у середньому за тиждень', from:'з', wk:'тиж.', before:'до', perWeek:' / тиждень',
+       chConv:'Конверсії по тижнях', byCamp:'за кампаніями', chCpa:'Ціна конверсії', chClicks:'Кліки та витрати',
+       compare:'Порівняння періодів', periodA:'Період', periodB:'Порівняти з', metric:'Показник', change:'Зміна', fromW:'з', toW:'по', weeks:'тиж.', convByCamp:'Конверсії за кампаніями',
+       editNote:'Зміни зберігаються прямо в Google-таблиці й з’являються у звіті, коли ви повертаєтесь на вкладку «Звіт».',
+       openSheets:'Відкрити в Google Таблицях ↗', loading:'Завантажуємо актуальні дані…', loadErr:'Не вдалося завантажити звіт', tryAgain:'Спробуйте ще раз за хвилину.',
+       updated:'Джерело: Google Таблиці · оновлено', badLink:'Посилання недійсне', askManager:'Попросіть у вашого менеджера нове посилання.' },
+  ru:{ weekly:'Еженедельный отчёт Google Ads', reportFor:'Отчёт за неделю', preparedBy:'Подготовлено', refresh:'Обновить',
+       tabReport:'Отчёт', tabEdit:'Редактировать данные', results:'Результаты',
+       w1:'Последняя неделя', w2:'2 недели', w3:'3 недели', w4:'Месяц',
+       vsPrev:'к предыдущему периоду', vs:'по сравнению с', noCmp:'нет данных для сравнения',
+       conv:'Конверсии', cpa:'Цена конверсии', cost:'Расход', clicks:'Клики', impr:'Показы', cpc:'Ср. цена клика', ctr:'CTR', value:'Ценность конверсий', roas:'ROAS',
+       weeklyData:'Данные по неделям', lastTag:'последняя неделя',
+       beforeAfter:'До и после · в среднем за неделю', from:'с', wk:'нед.', before:'до', perWeek:' / неделя',
+       chConv:'Конверсии по неделям', byCamp:'по кампаниям', chCpa:'Цена конверсии', chClicks:'Клики и расход',
+       compare:'Сравнение периодов', periodA:'Период', periodB:'Сравнить с', metric:'Показатель', change:'Изменение', fromW:'с', toW:'по', weeks:'нед.', convByCamp:'Конверсии по кампаниям',
+       editNote:'Изменения сохраняются прямо в Google-таблице и появляются в отчёте, когда вы возвращаетесь на вкладку «Отчёт».',
+       openSheets:'Открыть в Google Таблицах ↗', loading:'Загружаем актуальные данные…', loadErr:'Не удалось загрузить отчёт', tryAgain:'Попробуйте ещё раз через минуту.',
+       updated:'Источник: Google Таблицы · обновлено', badLink:'Ссылка недействительна', askManager:'Попросите у вашего менеджера новую ссылку.' },
 };
-let projects = store.get();
+const LOCALE = {en:'en-GB', uk:'uk-UA', ru:'ru-RU'};
+
+/* =====================================================================
+   Storage
+   ===================================================================== */
+const LS_KEY = 'rt_ads_projects_v1', LS_LANG='rt_ads_lang';
+const ls = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let projects = ls.get(LS_KEY, []);
 let currentId = null;
 
 /* =====================================================================
@@ -199,8 +284,8 @@ let currentId = null;
    ===================================================================== */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const PALETTE = ['#2F6FED','#16203A','#8AAEF7','#16A06A','#F2A93B','#9B6CF0','#E76F8F','#29B6C9','#B0B8C9'];
-const avColor = s => { let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))>>>0; return ['#2F6FED','#16A06A','#F2A93B','#9B6CF0','#E76F8F','#29B6C9','#E2733A'][h%7]; };
+const PALETTE = ['#FF7061','#1B1B1F','#FFB4A9','#8C8C96','#F5C26B','#5B8DEF','#2FB37A','#C9C9D1'];
+const avColor = s => { let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))>>>0; return ['#FF7061','#4B4B55','#2FB37A','#5B8DEF','#E9A23B','#9B6CF0','#E76F8F'][h%7]; };
 function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove('on'),2200); }
 function b64e(o){ return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
 function b64d(s){ s=s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='='; return JSON.parse(decodeURIComponent(escape(atob(s)))); }
@@ -248,16 +333,15 @@ function parseCSV(t){
 }
 
 /* =====================================================================
-   Smart structure detection — works for differently built tables
+   Smart structure detection
    ===================================================================== */
 function makeNum(rows){
-  // Detect decimal comma (e.g. "1237,15") anywhere in the sheet
   const flat = rows.flat();
   const commaDec = flat.some(c => /^[^\d-]*-?\d+,\d{1,2}\s*[^\d]*$/.test(c));
   return function num(s){
     if(s==null) return null;
     s=String(s).trim(); if(!s) return null;
-    if(/^\d{1,2}[./]\d{1,2}[./]\d{2,4}$/.test(s)) return null;           // a date
+    if(/^\d{1,2}[./]\d{1,2}[./]\d{2,4}$/.test(s)) return null;
     const pct = s.includes('%');
     let neg = /^\(.*\)$/.test(s) || /^-/.test(s.replace(/^[^\d-]+/,''));
     let c = s.replace(/[\s ]/g,'').replace(/^[^\d.,-]+|[^\d.,]+$/g,'').replace(/^-/,'');
@@ -272,7 +356,6 @@ function makeNum(rows){
     return v;
   };
 }
-
 const RX = {
   ctr:   /\bctr\b/i,
   cpc:   /(avr|avg|aver|average|сер)\W*\.?\s*(cost|cpc)\b|\bcpc\b|cost per click|ціна\s*кліку|вартість\s*кліку|цена\s*клика/i,
@@ -285,7 +368,6 @@ const RX = {
   total: /total|всього|усього|разом|итого|загал|sum\b/i,
   conv:  /conv|конв|lead|лід|лид|\bcall|дзвін|звон|form|форм|purchase|покуп|продаж|sale|заявк|order|замов/i,
 };
-
 function analyze(rows){
   const num = makeNum(rows);
   rows = rows.map(r=>r.slice());
@@ -295,7 +377,6 @@ function analyze(rows){
   const numCount = r => r.filter(isNum).length;
   const textCount = r => r.filter(c=>c && !isNum(c)).length;
 
-  // 1) header row = a row with >=3 text cells followed (soon) by a row with >=3 numbers
   let h=-1;
   for(let i=0;i<rows.length && h<0;i++){
     if(textCount(rows[i])<3) continue;
@@ -306,12 +387,10 @@ function analyze(rows){
   }
   if(h<0) throw new Error('Не вдалося знайти рядок із заголовками колонок.');
   const header = rows[h];
-  // group row above (merged cells → forward-fill)
-  let group = new Array(W).fill('');
-  if(h>0 && rows[h-1].some(Boolean)){ let last=''; group = rows[h-1].map(c=>(last = c || last)); }
+  const groupRaw = (h>0 && rows[h-1].some(Boolean)) ? rows[h-1] : new Array(W).fill('');
+  let last=''; const group = groupRaw.map(c=>(last = c || last));
 
   const body = rows.slice(h+1);
-  // 2) period column = first column whose cells are mostly text
   let pc=0, best=-1;
   for(let c=0;c<W;c++){
     const vals = body.map(r=>r[c]).filter(Boolean);
@@ -321,7 +400,6 @@ function analyze(rows){
     if(share>best){ best=share; pc=c; }
   }
 
-  // 3) classify columns
   const cols = [];
   for(let c=0;c<W;c++){
     if(c===pc) continue;
@@ -340,19 +418,16 @@ function analyze(rows){
     else if(RX.cost.test(hd)) role='cost';
     else if(RX.total.test(hd)) role='total';
     else if(RX.conv.test(hd) || RX.conv.test(g)) role='part';
-    cols.push({c, name: hd || ('Column '+(c+1)), role, group:g});
+    cols.push({c, name: hd || ('Column '+(c+1)), role, group: group[c] && c>=groupRaw.findIndex(Boolean) ? g : ''});
   }
-  // keep only first column per single role
   const seen = {};
   cols.forEach(o=>{ if(o.role!=='part' && o.role!=='other'){ if(seen[o.role]) o.role='other'; else seen[o.role]=1; } });
-  // "Conversions" alone (no breakdown, no total) => total
   const parts = cols.filter(o=>o.role==='part');
   if(!seen.total && parts.length===1){ parts[0].role='total'; seen.total=1; }
 
   const curM = (header.join(' ')+' '+group.join(' ')).match(/NZ\$|AU\$|US\$|CA\$|A\$|\$|€|£|₴|zł|грн|USD|EUR|GBP|UAH|NZD|AUD|CAD|PLN/);
   const currency = curM ? curM[0] : '';
 
-  // 4) rows: data vs markers
   const metricCols = cols.map(o=>o.c);
   const data=[]; let pending=[];
   for(const r of body){
@@ -365,21 +440,20 @@ function analyze(rows){
       continue;
     }
     if(/^(total|разом|всього|усього|итого|average|сер|avg)/i.test(label)) continue;
-    const row = { label: label || '—', markers: pending, v:{}, parts:{} };
+    const row = { label: label || '—', markers: pending, v:{}, parts:{}, raw:{} };
     pending = [];
     cols.forEach(o=>{
       const val = num(r[o.c]);
+      row.raw[o.c] = r[o.c];
       if(o.role==='part') row.parts[o.name] = val ?? 0;
       else if(o.role==='other') row.v['_'+o.name] = val;
       else row.v[o.role] = val;
     });
     data.push(row);
   }
-  // drop trailing rows that have no spend and no conversions (unfilled weeks)
   while(data.length && !data[data.length-1].v.cost && !data[data.length-1].v.total && !Object.values(data[data.length-1].parts).some(Boolean)) data.pop();
   if(!data.length) throw new Error('У таблиці не знайдено рядків з даними.');
 
-  // 5) derived metrics
   const partNames = cols.filter(o=>o.role==='part').map(o=>o.name);
   data.forEach(d=>{
     const v=d.v;
@@ -391,248 +465,319 @@ function analyze(rows){
     else if(v.ctr!=null && v.ctr>1) v.ctr = v.ctr/100;
     if(v.roas==null && v.value!=null && v.cost) v.roas = v.value/v.cost;
   });
-  const others = cols.filter(o=>o.role==='other' && data.some(d=>d.v['_'+o.name]!=null)).map(o=>o.name);
-  return { data, partNames, others, currency, cols, header, periodName: header[pc] || 'Period' };
+  // columns that actually have something to show (header or data)
+  const showCols = cols.filter(o=>o.name && (data.some(d=>d.raw[o.c]) || o.role!=='other'));
+  return { data, partNames, cols:showCols, currency, periodName: header[pc] || 'Date' };
 }
 
 /* =====================================================================
-   Formatting
+   Aggregation & formatting
    ===================================================================== */
-const METRICS = {
-  conv:  {label:'Conversions', fmt:'int', better:'up'},
-  cpa:   {label:'Cost / conversion', fmt:'money2', better:'down'},
-  cost:  {label:'Spend', fmt:'money0', better:'none'},
-  clicks:{label:'Clicks', fmt:'int', better:'up'},
-  impr:  {label:'Impressions', fmt:'int', better:'up'},
-  cpc:   {label:'Avg. CPC', fmt:'money2', better:'down'},
-  ctr:   {label:'CTR', fmt:'pct', better:'up'},
-  value: {label:'Conv. value', fmt:'money0', better:'up'},
-  roas:  {label:'ROAS', fmt:'x', better:'up'},
-};
-function fmt(v, kind, cur){
+const METRIC_FMT = { conv:'int', cpa:'money2', cost:'money2', clicks:'int', impr:'int', cpc:'money2', ctr:'pct', value:'money2', roas:'x' };
+const BETTER = { conv:'up', cpa:'down', cost:'none', clicks:'up', impr:'up', cpc:'down', ctr:'up', value:'up', roas:'up' };
+const SUMMABLE = ['cost','impr','clicks','conv','value'];
+function agg(rows, partNames){
+  const o={v:{}, parts:{}};
+  if(!rows.length) return null;
+  const sum = k => { const a=rows.map(r=>r.v[k]).filter(x=>x!=null); return a.length ? a.reduce((s,x)=>s+x,0) : null; };
+  const mean = k => { const a=rows.map(r=>r.v[k]).filter(x=>x!=null); return a.length ? a.reduce((s,x)=>s+x,0)/a.length : null; };
+  SUMMABLE.forEach(k=>o.v[k]=sum(k));
+  o.v.cpa  = (o.v.cost!=null && o.v.conv) ? o.v.cost/o.v.conv : mean('cpa');
+  o.v.cpc  = (o.v.cost!=null && o.v.clicks) ? o.v.cost/o.v.clicks : mean('cpc');
+  o.v.ctr  = (o.v.clicks!=null && o.v.impr) ? o.v.clicks/o.v.impr : mean('ctr');
+  o.v.roas = (o.v.value!=null && o.v.cost) ? o.v.value/o.v.cost : mean('roas');
+  partNames.forEach(n=>o.parts[n]=rows.reduce((s,r)=>s+(r.parts[n]||0),0));
+  return o;
+}
+function fmt(v, kind, cur, lang){
   if(v==null || isNaN(v)) return '—';
-  const nf = (d)=> v.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const loc = LOCALE[lang]||'en-GB';
+  const nf = d => v.toLocaleString(loc,{minimumFractionDigits:d,maximumFractionDigits:d});
   switch(kind){
-    case 'int': return Math.round(v).toLocaleString('en-US');
+    case 'int': return Math.round(v).toLocaleString(loc);
     case 'money0': return (cur?cur+' ':'')+nf(0);
     case 'money2': return (cur?cur+' ':'')+nf(2);
-    case 'pct': return (v*100).toFixed(2)+'%';
-    case 'x': return v.toFixed(2)+'×';
+    case 'pct': return (v*100).toLocaleString(loc,{minimumFractionDigits:2,maximumFractionDigits:2})+'%';
+    case 'x': return nf(2)+'×';
     default: return nf(Math.abs(v)<10?2:0);
   }
 }
 function delta(cur, prev, better){
-  if(cur==null || prev==null || !prev) return {txt:'no comparison', cls:''};
+  if(cur==null || prev==null || !prev) return {ch:null, cls:''};
   const ch = cur/prev-1;
-  const arrow = ch>0 ? '▲' : ch<0 ? '▼' : '•';
   let cls='';
   if(better==='up') cls = ch>0?'good':ch<0?'bad':'';
   if(better==='down') cls = ch<0?'good':ch>0?'bad':'';
-  return {txt:`${arrow} ${Math.abs(ch*100).toFixed(1)}% vs prev. week`, cls, ch};
+  return {ch, cls};
 }
-const avg = arr => { const a=arr.filter(x=>x!=null && !isNaN(x)); return a.length ? a.reduce((s,x)=>s+x,0)/a.length : null; };
+const pctTxt = ch => ch==null ? '—' : `${ch>0?'▲':ch<0?'▼':'•'} ${Math.abs(ch*100).toFixed(1)}%`;
+function rangeLabel(rows){
+  if(!rows.length) return '';
+  const a=rows[0].label, b=rows[rows.length-1].label;
+  if(rows.length===1) return a;
+  const s=a.split(/\s*[-–—]\s*/)[0], e=b.split(/\s*[-–—]\s*/).pop();
+  return `${s} – ${e}`;
+}
+const avgOf = arr => { const a=arr.filter(x=>x!=null && !isNaN(x)); return a.length ? a.reduce((s,x)=>s+x,0)/a.length : null; };
 
 /* =====================================================================
-   Render report
+   Report
    ===================================================================== */
 let charts=[];
 function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[]; }
+let R = null;   // current report state
 
-async function renderReport(p, mode){
-  destroyCharts();
-  const view = $('#view');
-  const head = `
-    ${mode==='client' ? `<div class="by"><div class="logo">R</div>Prepared by RegisTeam</div>` : ''}
+function startReport(p, mode){
+  const lang = (mode==='client' ? ls.get(LS_LANG,null) : null) || p.lang || 'en';
+  R = { p, mode, lang, A:null, win:1, cmp:null, tab:'report', err:null };
+  renderShell(); loadData();
+}
+async function loadData(){
+  const st = R; st.A=null; st.err=null; renderBody();
+  try{ st.A = analyze(await fetchSheet(st.p)); }
+  catch(e){ st.err = e; }
+  if(R===st) renderBody();
+}
+function renderShell(){
+  const {p, mode, lang} = R, T=I18N[lang];
+  document.documentElement.lang = lang;
+  $('#view').innerHTML = `
+    <div class="topbar">
+      ${mode==='client' ? `<div class="wm"><b>REGIS</b><span>TEAM</span></div>` : `<div class="note">Перегляд звіту · так його бачить клієнт</div>`}
+      <div class="lang" id="langSw">${['en','uk','ru'].map(l=>`<button data-l="${l}" class="${l===lang?'on':''}">${({en:'EN',uk:'UA',ru:'RU'})[l]}</button>`).join('')}</div>
+    </div>
     <div class="rhead">
-      <div><h1>${esc(p.name)}</h1><div class="sub" id="subline">Google Ads · weekly performance report</div></div>
+      <div><h1>${esc(p.name)}</h1><div class="sub" id="subline">${T.weekly}</div></div>
       <div class="actions">
         ${mode==='admin' ? `
           <button class="btn primary" id="copyLink">🔗 Копіювати лінк для клієнта</button>
           <button class="btn" id="openClient">Відкрити як клієнт</button>
           <button class="btn ghost" id="editP">Редагувати</button>
           <button class="btn ghost danger" id="delP">Видалити</button>` : `
-          <button class="btn" id="refresh">↻ Refresh</button>`}
+          <button class="btn" id="refresh">↻ ${T.refresh}</button>`}
       </div>
     </div>
     <div class="tabs">
-      <button class="tab on" data-t="report">${mode==='client'?'Report':'Звіт'}</button>
-      <button class="tab" data-t="data">${mode==='client'?'Edit data':'Таблиця (редагування)'}</button>
+      <button class="tab ${R.tab==='report'?'on':''}" data-t="report">${T.tabReport}</button>
+      <button class="tab ${R.tab==='data'?'on':''}" data-t="data">${T.tabEdit}</button>
     </div>
     <div id="tabBody"></div>`;
-  view.innerHTML = head;
-
+  $('#langSw').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    R.lang=b.dataset.l; if(R.mode==='client') ls.set(LS_LANG,R.lang);
+    renderShell(); renderBody();
+  });
   if(mode==='admin'){
     $('#copyLink').onclick = ()=>copyClientLink(p);
     $('#openClient').onclick = ()=>window.open(clientLink(p),'_blank');
     $('#editP').onclick = ()=>openModal(p);
-    $('#delP').onclick = ()=>{ if(confirm(`Видалити проєкт «${p.name}» зі списку? Таблиця в Google не зміниться.`)){ projects=projects.filter(x=>x.uid!==p.uid); store.set(projects); currentId=projects[0]?.uid||null; renderSide(); route(); } };
+    $('#delP').onclick = ()=>deleteProject(p);
   } else {
-    $('#refresh').onclick = ()=>showTab('report');
+    $('#refresh').onclick = ()=>{ R.tab='report'; renderShell(); loadData(); };
   }
-  view.querySelectorAll('.tab').forEach(b=>b.onclick=()=>showTab(b.dataset.t));
-
-  async function showTab(t){
-    view.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on', b.dataset.t===t));
-    destroyCharts();
-    const body = $('#tabBody');
-    if(t==='data'){
-      body.innerHTML = `
-        <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-          <div class="note">${mode==='client' ? 'Changes you make here are saved to the Google Sheet and appear in the report after you switch back to “Report”.' : 'Зміни зберігаються прямо в Google-таблиці. Поверніться на «Звіт» — він оновиться.'}</div>
-          <a class="btn" href="${sheetEditUrl(p)}" target="_blank" rel="noopener">${mode==='client'?'Open in Google Sheets ↗':'Відкрити в Google Sheets ↗'}</a>
-        </div>
-        <iframe class="frame" src="https://docs.google.com/spreadsheets/d/${p.id}/edit?rm=minimal#gid=${p.gid}" title="Sheet"></iframe>`;
-      return;
-    }
-    body.innerHTML = `<div class="state"><div class="spin"></div>${mode==='client'?'Loading the latest data…':'Завантажую дані з таблиці…'}</div>`;
-    let A;
-    try{ A = analyze(await fetchSheet(p)); }
-    catch(e){
-      body.innerHTML = `<div class="state"><h2>${mode==='client'?'Could not load the report':'Не вдалося завантажити таблицю'}</h2>
-        ${mode==='client' ? 'Please try again in a minute.' :
-          `Перевірте, що таблиця відкрита «Усі, хто має посилання», і що в лінку правильна вкладка (gid).<br><span class="note">${esc(e.message)}</span>`}</div>`;
-      return;
-    }
-    drawReport(A, p, mode, body);
-  }
-  showTab('report');
+  $('#view').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+    const was=R.tab; R.tab=b.dataset.t; renderShell();
+    if(R.tab==='report' && was==='data') loadData(); else renderBody();
+  });
 }
 
-function drawReport(A, p, mode, body){
-  const {data, partNames, currency:cur} = A;
-  const last = data[data.length-1], prev = data[data.length-2];
-  $('#subline').innerHTML = `Google Ads · weekly report · ${esc(data[0].label)} — ${esc(last.label)}`;
+function renderBody(){
+  destroyCharts();
+  const body = $('#tabBody'); if(!body) return;
+  const {p, mode, lang} = R, T=I18N[lang];
+  if(R.tab==='data'){
+    body.innerHTML = `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div class="note">${T.editNote}</div>
+        <a class="btn" href="${sheetEditUrl(p)}" target="_blank" rel="noopener">${T.openSheets}</a>
+      </div>
+      <iframe class="frame" src="https://docs.google.com/spreadsheets/d/${p.id}/edit?rm=minimal#gid=${p.gid}" title="Google Sheet"></iframe>`;
+    return;
+  }
+  if(R.err){
+    body.innerHTML = `<div class="state"><h2>${T.loadErr}</h2>${mode==='client' ? T.tryAgain :
+      `Перевірте, що таблиця відкрита «Усі, хто має посилання», і що в лінку правильна вкладка (gid).<br><span class="note">${esc(R.err.message)}</span>`}</div>`;
+    return;
+  }
+  if(!R.A){ body.innerHTML = `<div class="state"><div class="spin"></div>${T.loading}</div>`; return; }
+  drawReport(body);
+}
 
-  // KPI cards
-  const order = ['conv','cpa','cost','clicks','cpc','ctr','impr','value','roas'];
-  const avail = order.filter(k=>data.some(d=>d.v[k]!=null));
-  const kpis = avail.slice(0,8).map(k=>{
-    const m=METRICS[k], d=delta(last.v[k], prev?.v[k], m.better);
-    return `<div class="kpi"><div class="lb">${m.label}</div><div class="v">${fmt(last.v[k], m.fmt, cur)}</div><div class="d ${d.cls}">${d.txt}</div></div>`;
+function drawReport(body){
+  const {A, lang, mode} = R, T=I18N[lang], cur=A.currency;
+  const {data, partNames} = A;
+  const n = data.length, last = data[n-1];
+  $('#subline').innerHTML = `${T.reportFor} <b>${esc(last.label)}</b> · ${T.weekly}`;
+  const has = k => data.some(d=>d.v[k]!=null);
+
+  /* ---- 1. Results with period switch ---- */
+  const win = Math.min(R.win, n);
+  const curRows = data.slice(n-win), prevRows = data.slice(Math.max(0,n-2*win), n-win);
+  const aC = agg(curRows, partNames), aP = prevRows.length===win ? agg(prevRows, partNames) : null;
+  const kOrder = ['conv','cpa','cost','clicks','cpc','ctr','impr','value','roas'].filter(has);
+  const kpis = kOrder.map(k=>{
+    const d = aP ? delta(aC.v[k], aP.v[k], BETTER[k]) : {ch:null,cls:''};
+    return `<div class="kpi"><div class="lb">${T[k]}</div><div class="v">${fmt(aC.v[k], k==='cost'?'money0':METRIC_FMT[k], cur, lang)}</div>
+      <div class="d ${d.cls}">${d.ch==null ? T.noCmp : pctTxt(d.ch)}</div></div>`;
   }).join('');
+  const segs = [[1,'w1'],[2,'w2'],[3,'w3'],[4,'w4']].map(([w,k])=>`<button data-w="${w}" class="${R.win===w?'on':''}" ${w>n?'disabled style="opacity:.4"':''}>${T[k]}</button>`).join('');
 
-  // Before / after marker
+  /* ---- 2. Sheet-structured table ---- */
+  const cols = A.cols;
+  // group header row (spans)
+  let grpHtml='', anyGroup = cols.some(o=>o.group);
+  if(anyGroup){
+    const spans=[]; cols.forEach(o=>{ const g=o.group||''; if(spans.length && spans[spans.length-1].g===g) spans[spans.length-1].n++; else spans.push({g,n:1}); });
+    let gi=0;
+    grpHtml = `<tr class="grp"><th class="empty"></th>${spans.map(s=>`<th colspan="${s.n}" class="${s.g?('g'+((gi++)%2)):'empty'}">${esc(s.g)}</th>`).join('')}</tr>`;
+  }
+  const colFmt = o => ({cost:'money2', impr:'int', clicks:'int', cpc:'money2', ctr:'pct', cpa:'money2', total:'int', part:'int', value:'money2', roas:'x'})[o.role];
+  const cellVal = (d,o) => {
+    if(o.role==='other') return esc(d.raw[o.c]||'');
+    const v = o.role==='part' ? d.parts[o.name] : (o.role==='total' ? d.v.total : d.v[o.role]);
+    if(o.role==='part' && !d.raw[o.c]) return '';
+    return fmt(v, colFmt(o), '', lang);
+  };
+  const trs = data.map((d,i)=>{
+    const mk = d.markers.map(m=>`<tr class="mk"><td colspan="${cols.length+1}">◆ ${esc(m)}</td></tr>`).join('');
+    const isLast = i===n-1;
+    return mk + `<tr class="${isLast?'last':''}"><td ${isLast?`data-tag="${esc(T.lastTag)}"`:''}>${esc(d.label)}</td>${cols.map(o=>`<td class="${['total','cpa'].includes(o.role)?'b':''}">${cellVal(d,o)}</td>`).join('')}</tr>`;
+  }).join('');
+  const table = `<div class="tblwrap"><table class="tbl"><thead>${grpHtml}<tr class="hd"><th>${esc(A.periodName)}</th>${cols.map(o=>`<th>${esc(o.name)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div>`;
+
+  /* ---- 3. Before / after ---- */
   let banner='';
   const mi = data.findIndex(d=>d.markers.length);
   if(mi>0){
     const before=data.slice(0,mi), after=data.slice(mi);
-    const items = ['conv','cpa','clicks','cpc','ctr','roas'].filter(k=>avail.includes(k)).slice(0,4).map(k=>{
-      const m=METRICS[k], b=avg(before.map(d=>d.v[k])), a=avg(after.map(d=>d.v[k]));
-      const d=delta(a,b,m.better);
-      const pc = d.ch==null?'neu':(d.cls||'neu');
-      return `<div class="it"><div class="lb">${m.label}${['conv','clicks'].includes(k)?' / week':''}</div>
-        <div class="vals"><span class="before">${fmt(b,m.fmt,'')}</span><span class="after">${fmt(a,m.fmt,'')}</span>
+    const items = ['conv','cpa','clicks','cpc','ctr','roas'].filter(has).slice(0,4).map(k=>{
+      const b=avgOf(before.map(d=>d.v[k])), a=avgOf(after.map(d=>d.v[k]));
+      const d=delta(a,b,BETTER[k]); const pc = d.ch==null?'neu':(d.cls||'neu');
+      return `<div class="it"><div class="lb">${T[k]}${['conv','clicks'].includes(k)?T.perWeek:''}</div>
+        <div class="vals"><span class="before">${fmt(b,METRIC_FMT[k],'',lang)}</span><span class="after">${fmt(a,METRIC_FMT[k],'',lang)}</span>
         <span class="pill ${pc}">${d.ch==null?'—':(d.ch>0?'+':'')+(d.ch*100).toFixed(0)+'%'}</span></div></div>`;
     }).join('');
-    banner = `<div class="banner"><div class="t">Before vs. after · weekly average</div>
-      <div class="h">${esc(data[mi].markers[0])} <span style="color:#9FB2E8;font-weight:500">— from ${esc(data[mi].label)} (${after.length} wk vs ${before.length} wk before)</span></div>
+    banner = `<div class="banner"><div class="t">${T.beforeAfter}</div>
+      <div class="h">${esc(data[mi].markers[0])} <span>— ${T.from} ${esc(data[mi].label)} (${after.length} ${T.wk} / ${before.length} ${T.wk} ${T.before})</span></div>
       <div class="ba">${items}</div></div>`;
   }
 
-  // Campaign breakdown
-  let camp='';
-  if(partNames.length>1){
-    const tot = partNames.reduce((s,n)=>s+(last.parts[n]||0),0) || 1;
-    camp = partNames.map((n,i)=>{
-      const v=last.parts[n]||0, pv=prev?.parts[n];
-      const d=delta(v,pv,'up');
-      return `<div class="r"><div class="n">${esc(n)}</div><div class="num">${fmt(v,'int')}</div>
-        <div class="bar"><i style="width:${(v/tot*100).toFixed(1)}%;background:${PALETTE[i%PALETTE.length]}"></i></div>
-        <div class="meta">${(v/tot*100).toFixed(0)}% of conversions · <span class="d ${d.cls}">${pv==null?'':d.txt}</span></div></div>`;
-    }).join('');
+  /* ---- 4. Compare periods ---- */
+  if(!R.cmp || R.cmp.n!==n){
+    const w = Math.min(4, Math.floor(n/2)) || 1;
+    R.cmp = { n, a0:n-w, a1:n-1, b0:Math.max(0,n-2*w), b1:Math.max(0,n-w-1) };
   }
-
-  // Table
-  const tcols = ['cost','impr','clicks','ctr','cpc'].filter(k=>avail.includes(k));
-  const tailCols = ['conv','cpa','value','roas'].filter(k=>avail.includes(k));
-  const cpas = data.map(d=>d.v.cpa).filter(x=>x!=null);
-  const mn=Math.min(...cpas), mx=Math.max(...cpas);
-  const heat = v => { if(v==null||mx===mn) return ''; const t=(v-mn)/(mx-mn); return `background:${t<.5?`rgba(22,160,106,${(.5-t)*.35})`:`rgba(217,67,75,${(t-.5)*.35})`}`; };
-  const trs = data.slice().reverse().map(d=>{
-    let mk = d.markers.map(m=>`<tr class="mk"><td colspan="99">◆ ${esc(m)}</td></tr>`).join('');
-    const cells = [
-      `<td>${esc(d.label)}</td>`,
-      ...tcols.map(k=>`<td>${fmt(d.v[k], METRICS[k].fmt, '')}</td>`),
-      ...partNames.map(n=>`<td>${fmt(d.parts[n],'int')}</td>`),
-      ...tailCols.map(k=>`<td class="b" style="${k==='cpa'?heat(d.v.cpa):''}">${fmt(d.v[k], METRICS[k].fmt, '')}</td>`),
-    ].join('');
-    return `<tr>${cells}</tr>`+mk;   // reversed order → marker shown under its week
-  }).join('');
-  const ths = [A.periodName, ...tcols.map(k=>METRICS[k].label+(['cost','cpc'].includes(k)&&cur?`, ${cur}`:'')), ...partNames, ...tailCols.map(k=>METRICS[k].label)].map(t=>`<th>${esc(t)}</th>`).join('');
+  const opt = (sel)=> data.map((d,i)=>`<option value="${i}" ${i===sel?'selected':''}>${esc(d.label)}</option>`).join('');
+  const cmpCtl = `
+    <div class="cmpctl">
+      <div class="cmpbox"><div class="lb"><i style="background:var(--coral)"></i>${T.periodA}</div>
+        <div class="sel">${T.fromW} <select data-k="a0">${opt(R.cmp.a0)}</select> ${T.toW} <select data-k="a1">${opt(R.cmp.a1)}</select></div></div>
+      <div class="cmpbox"><div class="lb"><i style="background:var(--char)"></i>${T.periodB}</div>
+        <div class="sel">${T.fromW} <select data-k="b0">${opt(R.cmp.b0)}</select> ${T.toW} <select data-k="b1">${opt(R.cmp.b1)}</select></div></div>
+    </div>`;
 
   body.innerHTML = `
-    <div class="kpis">${kpis}</div>
+    <div class="card">
+      <div class="chead"><h3>${T.results}</h3><div class="seg" id="seg">${segs}</div></div>
+      <div class="range"><b>${esc(rangeLabel(curRows))}</b>${aP ? ` · ${T.vs} ${esc(rangeLabel(prevRows))} <span style="opacity:.8">(${T.vsPrev})</span>` : ''}</div>
+      <div class="kpis">${kpis}</div>
+    </div>
+    <div class="card"><div class="chead"><h3>${T.weeklyData}</h3></div>${table}</div>
     ${banner}
     <div class="grid2">
-      <div class="card"><h3>Conversions per week${partNames.length>1?'<small>by campaign</small>':''}</h3><div class="chart"><canvas id="c1"></canvas></div></div>
-      ${camp ? `<div class="card"><h3>Last week by campaign<small>${esc(last.label)}</small></h3><div class="camp">${camp}</div></div>`
-             : `<div class="card"><h3>Spend per week</h3><div class="chart"><canvas id="c3"></canvas></div></div>`}
+      <div class="card"><div class="chead"><h3>${T.chConv}${partNames.length>1?`<small>${T.byCamp}</small>`:''}</h3></div><div class="chart"><canvas id="c1"></canvas></div></div>
+      <div class="card"><div class="chead"><h3>${T.chCpa}${cur?`<small>${esc(cur)}</small>`:''}</h3></div><div class="chart"><canvas id="c2"></canvas></div></div>
     </div>
-    <div class="grid2" style="margin-top:16px">
-      <div class="card"><h3>Cost per conversion${cur?`<small>${esc(cur)}</small>`:''}</h3><div class="chart sm"><canvas id="c2"></canvas></div></div>
-      <div class="card"><h3>Clicks & spend</h3><div class="chart sm"><canvas id="c4"></canvas></div></div>
+    <div class="card"><div class="chead"><h3>${T.chClicks}</h3></div><div class="chart sm"><canvas id="c4"></canvas></div></div>
+    <div class="card" id="cmpCard">
+      <div class="chead"><h3>${T.compare}</h3></div>
+      ${cmpCtl}
+      <div id="cmpOut"></div>
     </div>
-    <div class="card" style="margin-top:16px"><h3>All weeks</h3><div class="tblwrap"><table class="tbl"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table></div></div>
-    ${mode==='admin' ? `<div class="card"><h3>Що система розпізнала в таблиці</h3><div class="detected">
-      ${A.cols.map(o=>`<code>${esc(o.name)}</code> → ${({cost:'витрати',impr:'покази',clicks:'кліки',cpc:'ціна кліку',ctr:'CTR',cpa:'ціна конверсії',total:'всього конверсій',part:'конверсії (кампанія)',value:'цінність конверсій',roas:'ROAS',other:'інше (не в звіті)'})[o.role]}`).join(' · ')}
+    ${mode==='admin' ? `<div class="card"><div class="chead"><h3>Що система розпізнала в таблиці <small>видно лише вам</small></h3></div><div class="detected">
+      ${A.cols.map(o=>`<code>${esc(o.name)}</code> → ${({cost:'витрати',impr:'покази',clicks:'кліки',cpc:'ціна кліку',ctr:'CTR',cpa:'ціна конверсії',total:'всього конверсій',part:'конверсії (кампанія)',value:'цінність конверсій',roas:'ROAS',other:'інше (лише в таблиці)'})[o.role]}`).join(' · ')}
       ${data.some(d=>d.markers.length)?'<br>Позначки: '+data.filter(d=>d.markers.length).map(d=>`<code>${esc(d.markers.join(', '))}</code> перед ${esc(d.label)}`).join(', '):''}
-      <br>Порада: щоб показати «до/після», додайте в таблицю окремий рядок з текстом (напр. «Our optimisation started») перед потрібним тижнем.</div></div>` : ''}
-    <div class="foot"><span>Data source: Google Sheets · updated ${new Date().toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'})}</span><span>RegisTeam</span></div>`;
+      <br>Порада: щоб показати «до/після», додайте в таблицю окремий рядок лише з текстом (напр. «Our optimisation started») перед потрібним тижнем.</div></div>` : ''}
+    <div class="foot"><span>${T.updated} ${new Date().toLocaleString(LOCALE[lang],{dateStyle:'medium',timeStyle:'short'})}</span>
+      <span style="display:flex;align-items:center;gap:8px">${T.preparedBy} <span class="wm" style="transform:scale(.8);transform-origin:right center"><b>REGIS</b><span>TEAM</span></span></span></div>`;
 
+  $('#seg').querySelectorAll('button').forEach(b=>b.onclick=()=>{ if(b.disabled) return; R.win=+b.dataset.w; renderBody(); });
+  $('#cmpCard').querySelectorAll('select').forEach(s=>s.onchange=()=>{ R.cmp[s.dataset.k]=+s.value; drawCompare(); });
+  drawCompare();
   drawCharts(A);
 }
 
-/* vertical marker line plugin */
+function drawCompare(){
+  const {A, lang} = R, T=I18N[lang], cur=A.currency, c=R.cmp;
+  const sl = (x,y)=>A.data.slice(Math.min(x,y), Math.max(x,y)+1);
+  const ra=sl(c.a0,c.a1), rb=sl(c.b0,c.b1);
+  const a=agg(ra,A.partNames), b=agg(rb,A.partNames);
+  const keys = ['cost','impr','clicks','ctr','cpc','conv','cpa','value','roas'].filter(k=>A.data.some(d=>d.v[k]!=null));
+  const row = (label, va, vb, kind, better, cls='') => {
+    const d = delta(va, vb, better);
+    return `<tr class="${cls}"><td>${label}</td><td class="a">${fmt(va,kind,cur,lang)}</td><td>${fmt(vb,kind,cur,lang)}</td>
+      <td><span class="pill ${d.ch==null?'neu':(d.cls||'neu')}">${d.ch==null?'—':(d.ch>0?'+':'')+(d.ch*100).toFixed(1)+'%'}</span></td></tr>`;
+  };
+  let html = keys.map(k=>row(T[k], a.v[k], b.v[k], METRIC_FMT[k], BETTER[k])).join('');
+  if(A.partNames.length>1){
+    html += `<tr class="sec"><td colspan="4">${T.convByCamp}</td></tr>` + A.partNames.map(nm=>row(esc(nm), a.parts[nm], b.parts[nm], 'int', 'up', 'sub')).join('');
+  }
+  $('#cmpOut').innerHTML = `<div class="tblwrap" style="border:0"><table class="cmp"><thead><tr>
+      <th>${T.metric}</th>
+      <th><span style="color:var(--coral)">●</span> ${esc(rangeLabel(ra))} <span style="font-weight:500">(${ra.length} ${T.weeks})</span></th>
+      <th>● ${esc(rangeLabel(rb))} <span style="font-weight:500">(${rb.length} ${T.weeks})</span></th>
+      <th>${T.change}</th></tr></thead><tbody>${html}</tbody></table></div>`;
+}
+
+/* marker line plugin */
 const markerPlugin = {
   id:'markers',
   afterDatasetsDraw(chart, args, opts){
     const idx = opts.idx; if(idx==null || idx<0) return;
     const {ctx, chartArea:{top,bottom}, scales:{x}} = chart;
-    const px = x.getPixelForValue(idx) - (x.getPixelForValue(1)-x.getPixelForValue(0))/2;
-    ctx.save(); ctx.strokeStyle='#16A06A'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    const step = x.getPixelForValue(1)-x.getPixelForValue(0);
+    const px = x.getPixelForValue(idx) - step/2;
+    ctx.save(); ctx.strokeStyle='#FF7061'; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
     ctx.beginPath(); ctx.moveTo(px,top); ctx.lineTo(px,bottom); ctx.stroke();
-    ctx.setLineDash([]); ctx.fillStyle='#16A06A'; ctx.font='600 11px Inter,sans-serif';
+    ctx.setLineDash([]); ctx.fillStyle='#F0574A'; ctx.font='700 11px Montserrat,sans-serif';
     ctx.fillText(opts.text||'', px+5, top+12); ctx.restore();
   }
 };
 function drawCharts(A){
   if(!window.Chart) return;
-  Chart.defaults.font.family='Inter,system-ui,sans-serif'; Chart.defaults.color='#6B7590';
+  const T=I18N[R.lang];
+  Chart.defaults.font.family='Montserrat,system-ui,sans-serif'; Chart.defaults.color='#6E6E78';
   const {data, partNames} = A;
   const labels = data.map(d=>d.label);
   const mi = data.findIndex(d=>d.markers.length);
   const mk = {idx: mi>0?mi:null, text: mi>0 ? data[mi].markers[0] : ''};
-  const grid = {color:'#EEF1F6'}, noGrid={display:false};
-  const base = (extra={}) => ({responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
-    plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}, markers:mk, tooltip:{backgroundColor:'#16203A',padding:10}},
-    scales:{x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid, beginAtZero:true}}, ...extra});
+  const grid = {color:'#F0F0F3'}, noGrid={display:false};
+  const base = () => ({responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}, markers:mk, tooltip:{backgroundColor:'#1B1B1F',padding:10}},
+    scales:{x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:8}}, y:{grid, beginAtZero:true}}});
 
   const ds = partNames.length>1
-    ? partNames.map((n,i)=>({label:n, data:data.map(d=>d.parts[n]||0), backgroundColor:PALETTE[i%PALETTE.length], borderRadius:3, stack:'s'}))
-    : [{label:'Conversions', data:data.map(d=>d.v.conv), backgroundColor:'#2F6FED', borderRadius:4}];
+    ? partNames.map((nm,i)=>({label:nm, data:data.map(d=>d.parts[nm]||0), backgroundColor:PALETTE[i%PALETTE.length], borderRadius:3, stack:'s'}))
+    : [{label:T.conv, data:data.map(d=>d.v.conv), backgroundColor:'#FF7061', borderRadius:4}];
   const o1 = base(); o1.scales.x.stacked=true; o1.scales.y.stacked=true;
   if(partNames.length<=1) o1.plugins.legend.display=false;
   charts.push(new Chart($('#c1'), {type:'bar', data:{labels, datasets:ds}, options:o1, plugins:[markerPlugin]}));
 
   const o2 = base(); o2.plugins.legend.display=false; o2.scales.y.beginAtZero=false;
-  charts.push(new Chart($('#c2'), {type:'line', data:{labels, datasets:[{label:'Cost / conversion', data:data.map(d=>d.v.cpa), borderColor:'#2F6FED', backgroundColor:'rgba(47,111,237,.08)', fill:true, tension:.35, pointRadius:2.5, borderWidth:2.5}]}, options:o2, plugins:[markerPlugin]}));
+  charts.push(new Chart($('#c2'), {type:'line', data:{labels, datasets:[{label:T.cpa, data:data.map(d=>d.v.cpa), borderColor:'#1B1B1F', backgroundColor:'rgba(255,112,97,.10)', fill:true, tension:.35, pointRadius:2.5, pointBackgroundColor:'#FF7061', borderWidth:2.5}]}, options:o2, plugins:[markerPlugin]}));
 
-  const o4 = base({scales:{x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid,beginAtZero:true,title:{display:true,text:'Clicks'}}, y1:{position:'right',grid:noGrid,beginAtZero:true,title:{display:true,text:'Spend'}}}});
+  const o4 = base();
+  o4.scales = {x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid,beginAtZero:true,title:{display:true,text:T.clicks}}, y1:{position:'right',grid:noGrid,beginAtZero:true,title:{display:true,text:T.cost}}};
   charts.push(new Chart($('#c4'), {type:'bar', data:{labels, datasets:[
-    {label:'Clicks', data:data.map(d=>d.v.clicks), backgroundColor:'#C9D8FB', borderRadius:3, yAxisID:'y'},
-    {label:'Spend', type:'line', data:data.map(d=>d.v.cost), borderColor:'#16203A', pointRadius:0, borderWidth:2, tension:.3, yAxisID:'y1'}]}, options:o4, plugins:[markerPlugin]}));
-
-  const c3=$('#c3');
-  if(c3){ const o3=base(); o3.plugins.legend.display=false;
-    charts.push(new Chart(c3,{type:'bar',data:{labels,datasets:[{label:'Spend',data:data.map(d=>d.v.cost),backgroundColor:'#16203A',borderRadius:4}]},options:o3,plugins:[markerPlugin]})); }
+    {label:T.clicks, data:data.map(d=>d.v.clicks), backgroundColor:'#FFC9C1', borderRadius:3, yAxisID:'y'},
+    {label:T.cost, type:'line', data:data.map(d=>d.v.cost), borderColor:'#1B1B1F', pointRadius:0, borderWidth:2, tension:.3, yAxisID:'y1'}]}, options:o4, plugins:[markerPlugin]}));
 }
 
 /* =====================================================================
-   Client link
+   Client link — one permanent link per client
    ===================================================================== */
 function clientLink(p){
   const base = location.href.split('#')[0].split('?')[0];
-  return `${base}?r=${b64e({n:p.name, id:p.id, g:p.gid})}`;
+  return `${base}?r=${b64e({n:p.name, id:p.id, g:p.gid, l:p.lang||'en'})}`;
 }
 async function copyClientLink(p){
   const l = clientLink(p);
@@ -643,15 +788,28 @@ async function copyClientLink(p){
 /* =====================================================================
    Sidebar & modal (admin)
    ===================================================================== */
+function deleteProject(p){
+  if(!confirm(`Видалити проєкт «${p.name}» зі списку?\n\nGoogle-таблиця не зміниться, а лінк, який має клієнт, і далі працюватиме.`)) return;
+  projects = projects.filter(x=>x.uid!==p.uid); ls.set(LS_KEY, projects);
+  if(currentId===p.uid) currentId = null;
+  renderSide(); route(); toast('Проєкт видалено');
+}
 function renderSide(){
   const q = ($('#q').value||'').toLowerCase();
   const list = projects.filter(p=>p.name.toLowerCase().includes(q)).sort((a,b)=>a.name.localeCompare(b.name));
   $('#plist').innerHTML = list.length ? list.map(p=>`
     <div class="pitem ${p.uid===currentId?'active':''}" data-u="${p.uid}">
       <div class="av" style="background:${avColor(p.name)}">${esc(p.name.slice(0,1).toUpperCase())}</div>
-      <div class="nm">${esc(p.name)}</div></div>`).join('')
+      <div class="nm">${esc(p.name)}</div>
+      <button class="del" data-del="${p.uid}" title="Видалити проєкт" aria-label="Видалити проєкт">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+      </button></div>`).join('')
     : `<div class="empty">${projects.length?'Нічого не знайдено':'Ще немає проєктів'}</div>`;
-  $('#plist').querySelectorAll('.pitem').forEach(el=>el.onclick=()=>{ currentId=el.dataset.u; renderSide(); route(); });
+  $('#plist').querySelectorAll('.pitem').forEach(el=>el.onclick=(e)=>{
+    const del = e.target.closest('[data-del]');
+    if(del){ e.stopPropagation(); const p=projects.find(x=>x.uid===del.dataset.del); if(p) deleteProject(p); return; }
+    currentId=el.dataset.u; renderSide(); route();
+  });
 }
 let editing=null;
 function openModal(p){
@@ -660,42 +818,47 @@ function openModal(p){
   $('#mSave').textContent = p ? 'Зберегти' : 'Створити звіт';
   $('#fName').value = p?.name || '';
   $('#fUrl').value = p ? sheetEditUrl(p) : '';
+  $('#fLang').value = p?.lang || 'en';
   $('#fErr').textContent='';
   $('#modal').classList.add('on'); setTimeout(()=>$('#fName').focus(),50);
 }
 function closeModal(){ $('#modal').classList.remove('on'); }
 function saveModal(){
-  const name=$('#fName').value.trim(), s=parseSheetUrl($('#fUrl').value);
+  const name=$('#fName').value.trim(), s=parseSheetUrl($('#fUrl').value), lang=$('#fLang').value;
   if(!name){ $('#fErr').textContent='Вкажіть назву проєкту'; return; }
   if(!s){ $('#fErr').textContent='Це не схоже на посилання на Google-таблицю'; return; }
-  if(editing){ Object.assign(editing,{name,...s}); currentId=editing.uid; }
-  else { const p={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, ...s}; projects.push(p); currentId=p.uid; }
-  store.set(projects); closeModal(); renderSide(); route();
+  if(editing){
+    const changed = editing.id!==s.id || editing.gid!==s.gid || editing.name!==name || (editing.lang||'en')!==lang;
+    Object.assign(editing,{name,lang,...s}); currentId=editing.uid;
+    if(changed) setTimeout(()=>toast('Збережено. Лінк для клієнта оновився — скопіюйте новий'),300);
+  }
+  else { const p={uid:Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, lang, ...s}; projects.push(p); currentId=p.uid; }
+  ls.set(LS_KEY, projects); closeModal(); renderSide(); route();
 }
 
 /* =====================================================================
    Router
    ===================================================================== */
 function route(){
-  const params = new URLSearchParams(location.search);
-  const r = params.get('r');
+  const r = new URLSearchParams(location.search).get('r');
   if(r){
     document.getElementById('app').classList.add('client');
-    let p; try{ const o=b64d(r); p={name:o.n, id:o.id, gid:o.g||'0'}; }catch(e){ p=null; }
-    if(!p || !p.id){ $('#view').innerHTML='<div class="state"><h2>Link is not valid</h2>Please ask your account manager for a new link.</div>'; return; }
-    document.title = `${p.name} · Google Ads report`;
-    renderReport(p,'client');
+    let p; try{ const o=b64d(r); p={name:o.n, id:o.id, gid:o.g||'0', lang:o.l||'en'}; }catch(e){ p=null; }
+    if(!p || !p.id){ $('#view').innerHTML=`<div class="state"><h2>${I18N.en.badLink}</h2>${I18N.en.askManager}</div>`; return; }
+    document.title = `${p.name} · Google Ads report · RegisTeam`;
+    startReport(p,'client');
     return;
   }
   const p = projects.find(x=>x.uid===currentId) || projects[0];
   if(!p){
+    R=null;
     $('#view').innerHTML = `<div class="state" style="margin-top:40px"><h2>Додайте перший проєкт</h2>
       Натисніть «＋ Новий проєкт», вкажіть назву та лінк на Google-таблицю — звіт сформується автоматично.<br><br>
       <button class="btn primary" onclick="openModal()">＋ Новий проєкт</button></div>`;
     return;
   }
   currentId = p.uid; renderSide();
-  renderReport(p,'admin');
+  startReport(p,'admin');
 }
 
 $('#addBtn').onclick = ()=>openModal();
@@ -713,19 +876,15 @@ $('#impBtn').onclick = ()=>$('#impFile').click();
 $('#impFile').onchange = async e=>{
   const f=e.target.files[0]; if(!f) return;
   try{
-    const arr=JSON.parse(await f.text());
-    let added=0;
-    arr.forEach(p=>{ if(p.id && p.name && !projects.some(x=>x.id===p.id && x.gid===p.gid)){ projects.push({uid:p.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,6), name:p.name, id:p.id, gid:p.gid||'0'}); added++; } });
-    store.set(projects); renderSide(); route(); toast(`Додано проєктів: ${added}`);
+    const arr=JSON.parse(await f.text()); let added=0;
+    arr.forEach(p=>{ if(p.id && p.name && !projects.some(x=>x.id===p.id && x.gid===p.gid)){ projects.push({uid:p.uid||Date.now().toString(36)+Math.random().toString(36).slice(2,6), name:p.name, id:p.id, gid:p.gid||'0', lang:p.lang||'en'}); added++; } });
+    ls.set(LS_KEY, projects); renderSide(); route(); toast(`Додано проєктів: ${added}`);
   }catch(err){ toast('Не вдалося прочитати файл'); }
   e.target.value='';
 };
 
 renderSide();
 route();
-
-// expose for testing
-window.__analyze = analyze; window.__parseCSV = parseCSV;
 </script>
 </body>
 </html>
