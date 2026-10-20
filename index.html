@@ -150,6 +150,12 @@ a{color:var(--coral-dark)}
 .cmp tr.sec td{background:#FAFAFB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;font-weight:700;color:var(--muted)}
 
 .note{color:var(--muted);font-size:12px}
+.help{border-color:var(--coral-line);background:linear-gradient(180deg,#FFF8F6,#fff 120px)}
+.help h3{color:var(--coral-dark)}
+.gl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px 24px}
+.gl div{padding:10px 0;border-bottom:1px solid #F3E7E4}
+.gl dt{font-weight:700;margin-bottom:3px}
+.gl dd{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
 .frame{width:100%;height:72vh;border:1px solid var(--line);border-radius:var(--radius);background:#fff}
 .state{background:var(--panel);border:1px dashed #D7D7DD;border-radius:var(--radius);padding:40px;text-align:center;color:var(--muted)}
 .state h2{color:var(--ink);margin:0 0 6px;font-size:18px}
@@ -240,7 +246,7 @@ const I18N = {
        compare:'Compare periods', periodA:'Period', periodB:'Compare to', metric:'Metric', change:'Change', fromW:'from', toW:'to', weeks:'weeks', convByCamp:'Conversions by campaign',
        editNote:'Changes you make here are saved to the Google Sheet and appear in the report when you switch back to “Report”.',
        openSheets:'Open in Google Sheets ↗', loading:'Loading the latest data…', loadErr:'Could not load the report', tryAgain:'Please try again in a minute.',
-       updated:'Data source: Google Sheets · updated', badLink:'This link is not valid', askManager:'Please ask your account manager for a new link.' },
+       updated:'Data source: Google Sheets · updated', totalConv:'Total conversions', grpConv:'Google Ads conversions', grpInd:'Google Ads indicators', week:'Week', optStart:'Our optimisation started', badLink:'This link is not valid', askManager:'Please ask your account manager for a new link.' },
   uk:{ weekly:'Тижневий звіт Google Ads', reportFor:'Звіт за тиждень', preparedBy:'Підготовлено', refresh:'Оновити',
        tabReport:'Звіт', tabEdit:'Редагувати дані', results:'Результати',
        w1:'Останній тиждень', w2:'2 тижні', w3:'3 тижні', w4:'Місяць',
@@ -252,7 +258,7 @@ const I18N = {
        compare:'Порівняння періодів', periodA:'Період', periodB:'Порівняти з', metric:'Показник', change:'Зміна', fromW:'з', toW:'по', weeks:'тиж.', convByCamp:'Конверсії за кампаніями',
        editNote:'Зміни зберігаються прямо в Google-таблиці й з’являються у звіті, коли ви повертаєтесь на вкладку «Звіт».',
        openSheets:'Відкрити в Google Таблицях ↗', loading:'Завантажуємо актуальні дані…', loadErr:'Не вдалося завантажити звіт', tryAgain:'Спробуйте ще раз за хвилину.',
-       updated:'Джерело: Google Таблиці · оновлено', badLink:'Посилання недійсне', askManager:'Попросіть у вашого менеджера нове посилання.' },
+       updated:'Джерело: Google Таблиці · оновлено', totalConv:'Всього конверсій', grpConv:'Конверсії Google Ads', grpInd:'Показники Google Ads', week:'Тиждень', optStart:'Початок нашої оптимізації', badLink:'Посилання недійсне', askManager:'Попросіть у вашого менеджера нове посилання.' },
   ru:{ weekly:'Еженедельный отчёт Google Ads', reportFor:'Отчёт за неделю', preparedBy:'Подготовлено', refresh:'Обновить',
        tabReport:'Отчёт', tabEdit:'Редактировать данные', results:'Результаты',
        w1:'Последняя неделя', w2:'2 недели', w3:'3 недели', w4:'Месяц',
@@ -264,9 +270,57 @@ const I18N = {
        compare:'Сравнение периодов', periodA:'Период', periodB:'Сравнить с', metric:'Показатель', change:'Изменение', fromW:'с', toW:'по', weeks:'нед.', convByCamp:'Конверсии по кампаниям',
        editNote:'Изменения сохраняются прямо в Google-таблице и появляются в отчёте, когда вы возвращаетесь на вкладку «Отчёт».',
        openSheets:'Открыть в Google Таблицах ↗', loading:'Загружаем актуальные данные…', loadErr:'Не удалось загрузить отчёт', tryAgain:'Попробуйте ещё раз через минуту.',
-       updated:'Источник: Google Таблицы · обновлено', badLink:'Ссылка недействительна', askManager:'Попросите у вашего менеджера новую ссылку.' },
+       updated:'Источник: Google Таблицы · обновлено', totalConv:'Всего конверсий', grpConv:'Конверсии Google Ads', grpInd:'Показатели Google Ads', week:'Неделя', optStart:'Начало нашей оптимизации', badLink:'Ссылка недействительна', askManager:'Попросите у вашего менеджера новую ссылку.' },
 };
 const LOCALE = {en:'en-GB', uk:'uk-UA', ru:'ru-RU'};
+const HELP = {
+  en:{ title:'How to read this report', items:[
+    ['▲ ▼ and colours','Arrows show how a metric changed compared with the previous period. Green means the change is good for your business, red means it is worse. For cost metrics (cost per conversion, average CPC) a decrease is shown in green.'],
+    ['Spend','How much was spent on Google Ads during the period.'],
+    ['Impressions','How many times your ads were shown to people.'],
+    ['Clicks','How many times people clicked your ads and visited your website.'],
+    ['CTR','Click-through rate: the share of impressions that turned into a click (clicks ÷ impressions). A higher CTR means the ads are more relevant to people.'],
+    ['Avg. CPC','Average cost per click (spend ÷ clicks).'],
+    ['Conversions','Valuable actions people took after clicking an ad, such as calls, form submissions or purchases. The table shows them for each campaign.'],
+    ['Cost / conversion','How much one conversion costs on average (spend ÷ conversions). The lower, the better.'],
+    ['Results: Last week · 2 weeks · 3 weeks · Month','Totals for the selected period, compared with the same number of weeks right before it.'],
+    ['Compare periods','Pick any two date ranges to see how every metric and every campaign changed between them.'],
+    ['Edit data','Opens your Google Sheet. If you add or correct numbers there, the report updates when you return to the “Report” tab.'] ]},
+  uk:{ title:'Як читати цей звіт', items:[
+    ['▲ ▼ і кольори','Стрілки показують, як змінився показник порівняно з попереднім періодом. Зелений — зміна на користь вашого бізнесу, червоний — гірше. Для показників вартості (ціна конверсії, середня ціна кліку) зниження позначається зеленим.'],
+    ['Витрати','Скільки коштів витрачено на рекламу Google Ads за період.'],
+    ['Покази','Скільки разів вашу рекламу побачили люди.'],
+    ['Кліки','Скільки разів люди натиснули на рекламу й перейшли на ваш сайт.'],
+    ['CTR','Клікабельність: яка частка показів закінчилась кліком (кліки ÷ покази). Чим вищий CTR, тим цікавіша реклама для людей.'],
+    ['Сер. ціна кліку','Середня вартість одного кліку (витрати ÷ кліки).'],
+    ['Конверсії','Цільові дії після переходу з реклами: дзвінки, заявки, покупки тощо. У таблиці вони показані окремо для кожної кампанії.'],
+    ['Ціна конверсії','Скільки в середньому коштує одна конверсія (витрати ÷ конверсії). Чим нижча, тим краще.'],
+    ['Результати: останній тиждень · 2 тижні · 3 тижні · місяць','Підсумок за вибраний період порівняно з такою ж кількістю тижнів перед ним.'],
+    ['Порівняння періодів','Оберіть будь-які два проміжки, щоб побачити, як змінився кожен показник і кожна кампанія.'],
+    ['Редагувати дані','Відкриває вашу Google-таблицю. Якщо ви додасте або виправите там цифри, звіт оновиться, коли ви повернетесь на вкладку «Звіт».'] ]},
+  ru:{ title:'Как читать этот отчёт', items:[
+    ['▲ ▼ и цвета','Стрелки показывают, как изменился показатель по сравнению с предыдущим периодом. Зелёный — изменение в пользу вашего бизнеса, красный — хуже. Для показателей стоимости (цена конверсии, средняя цена клика) снижение отмечается зелёным.'],
+    ['Расход','Сколько средств потрачено на рекламу Google Ads за период.'],
+    ['Показы','Сколько раз вашу рекламу увидели люди.'],
+    ['Клики','Сколько раз люди нажали на рекламу и перешли на ваш сайт.'],
+    ['CTR','Кликабельность: какая доля показов закончилась кликом (клики ÷ показы). Чем выше CTR, тем интереснее реклама для людей.'],
+    ['Ср. цена клика','Средняя стоимость одного клика (расход ÷ клики).'],
+    ['Конверсии','Целевые действия после перехода с рекламы: звонки, заявки, покупки и т. д. В таблице они показаны отдельно для каждой кампании.'],
+    ['Цена конверсии','Сколько в среднем стоит одна конверсия (расход ÷ конверсии). Чем ниже, тем лучше.'],
+    ['Результаты: последняя неделя · 2 недели · 3 недели · месяц','Итог за выбранный период по сравнению с таким же количеством недель перед ним.'],
+    ['Сравнение периодов','Выберите любые два промежутка, чтобы увидеть, как изменился каждый показатель и каждая кампания.'],
+    ['Редактировать данные','Открывает вашу Google-таблицу. Если вы добавите или исправите там цифры, отчёт обновится, когда вы вернётесь на вкладку «Отчёт».'] ]},
+};
+function colLabel(o, T, cur){
+  const m = {cost:T.cost+(cur?`, ${cur}`:''), impr:T.impr, clicks:T.clicks, cpc:T.cpc+(cur?`, ${cur}`:''), ctr:T.ctr, cpa:T.cpa+(cur?`, ${cur}`:''), total:T.totalConv, value:T.value, roas:T.roas};
+  return m[o.role] || o.name;
+}
+function groupLabel(g, T){
+  if(/conv|конв/i.test(g)) return T.grpConv;
+  if(/indicat|показ|metric|\bga\b|google/i.test(g)) return T.grpInd;
+  return g;
+}
+const markerLabel = (m, T) => /optimi|оптиміз|оптимиз/i.test(m) ? T.optStart : m;
 
 /* =====================================================================
    Storage
@@ -510,7 +564,8 @@ function delta(cur, prev, better){
   if(better==='down') cls = ch<0?'good':ch>0?'bad':'';
   return {ch, cls};
 }
-const pctTxt = ch => ch==null ? '—' : `${ch>0?'▲':ch<0?'▼':'•'} ${Math.abs(ch*100).toFixed(1)}%`;
+const pf = (x,d=1) => x.toLocaleString(LOCALE[(R&&R.lang)||'en'],{minimumFractionDigits:d,maximumFractionDigits:d});
+const pctTxt = ch => ch==null ? '—' : `${ch>0?'▲':ch<0?'▼':'•'} ${pf(Math.abs(ch*100))}%`;
 function rangeLabel(rows){
   if(!rows.length) return '';
   const a=rows[0].label, b=rows[rows.length-1].label;
@@ -628,7 +683,7 @@ function drawReport(body){
   if(anyGroup){
     const spans=[]; cols.forEach(o=>{ const g=o.group||''; if(spans.length && spans[spans.length-1].g===g) spans[spans.length-1].n++; else spans.push({g,n:1}); });
     let gi=0;
-    grpHtml = `<tr class="grp"><th class="empty"></th>${spans.map(s=>`<th colspan="${s.n}" class="${s.g?('g'+((gi++)%2)):'empty'}">${esc(s.g)}</th>`).join('')}</tr>`;
+    grpHtml = `<tr class="grp"><th class="empty"></th>${spans.map(s=>`<th colspan="${s.n}" class="${s.g?('g'+((gi++)%2)):'empty'}">${esc(groupLabel(s.g,T))}</th>`).join('')}</tr>`;
   }
   const colFmt = o => ({cost:'money2', impr:'int', clicks:'int', cpc:'money2', ctr:'pct', cpa:'money2', total:'int', part:'int', value:'money2', roas:'x'})[o.role];
   const cellVal = (d,o) => {
@@ -637,29 +692,12 @@ function drawReport(body){
     if(o.role==='part' && !d.raw[o.c]) return '';
     return fmt(v, colFmt(o), '', lang);
   };
-  const trs = data.map((d,i)=>{
-    const mk = d.markers.map(m=>`<tr class="mk"><td colspan="${cols.length+1}">◆ ${esc(m)}</td></tr>`).join('');
+  const trs = data.map((d,i)=>[d,i]).reverse().map(([d,i])=>{
+    const mk = d.markers.map(m=>`<tr class="mk"><td colspan="${cols.length+1}">◆ ${esc(markerLabel(m,T))}</td></tr>`).join('');
     const isLast = i===n-1;
-    return mk + `<tr class="${isLast?'last':''}"><td ${isLast?`data-tag="${esc(T.lastTag)}"`:''}>${esc(d.label)}</td>${cols.map(o=>`<td class="${['total','cpa'].includes(o.role)?'b':''}">${cellVal(d,o)}</td>`).join('')}</tr>`;
+    return `<tr class="${isLast?'last':''}"><td ${isLast?`data-tag="${esc(T.lastTag)}"`:''}>${esc(d.label)}</td>${cols.map(o=>`<td class="${['total','cpa'].includes(o.role)?'b':''}">${cellVal(d,o)}</td>`).join('')}</tr>` + mk;
   }).join('');
-  const table = `<div class="tblwrap"><table class="tbl"><thead>${grpHtml}<tr class="hd"><th>${esc(A.periodName)}</th>${cols.map(o=>`<th>${esc(o.name)}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div>`;
-
-  /* ---- 3. Before / after ---- */
-  let banner='';
-  const mi = data.findIndex(d=>d.markers.length);
-  if(mi>0){
-    const before=data.slice(0,mi), after=data.slice(mi);
-    const items = ['conv','cpa','clicks','cpc','ctr','roas'].filter(has).slice(0,4).map(k=>{
-      const b=avgOf(before.map(d=>d.v[k])), a=avgOf(after.map(d=>d.v[k]));
-      const d=delta(a,b,BETTER[k]); const pc = d.ch==null?'neu':(d.cls||'neu');
-      return `<div class="it"><div class="lb">${T[k]}${['conv','clicks'].includes(k)?T.perWeek:''}</div>
-        <div class="vals"><span class="before">${fmt(b,METRIC_FMT[k],'',lang)}</span><span class="after">${fmt(a,METRIC_FMT[k],'',lang)}</span>
-        <span class="pill ${pc}">${d.ch==null?'—':(d.ch>0?'+':'')+(d.ch*100).toFixed(0)+'%'}</span></div></div>`;
-    }).join('');
-    banner = `<div class="banner"><div class="t">${T.beforeAfter}</div>
-      <div class="h">${esc(data[mi].markers[0])} <span>— ${T.from} ${esc(data[mi].label)} (${after.length} ${T.wk} / ${before.length} ${T.wk} ${T.before})</span></div>
-      <div class="ba">${items}</div></div>`;
-  }
+  const table = `<div class="tblwrap"><table class="tbl"><thead>${grpHtml}<tr class="hd"><th>${esc(T.week)}</th>${cols.map(o=>`<th>${esc(colLabel(o,T,cur))}</th>`).join('')}</tr></thead><tbody>${trs}</tbody></table></div>`;
 
   /* ---- 4. Compare periods ---- */
   if(!R.cmp || R.cmp.n!==n){
@@ -682,17 +720,17 @@ function drawReport(body){
       <div class="kpis">${kpis}</div>
     </div>
     <div class="card"><div class="chead"><h3>${T.weeklyData}</h3></div>${table}</div>
-    ${banner}
     <div class="grid2">
       <div class="card"><div class="chead"><h3>${T.chConv}${partNames.length>1?`<small>${T.byCamp}</small>`:''}</h3></div><div class="chart"><canvas id="c1"></canvas></div></div>
       <div class="card"><div class="chead"><h3>${T.chCpa}${cur?`<small>${esc(cur)}</small>`:''}</h3></div><div class="chart"><canvas id="c2"></canvas></div></div>
     </div>
-    <div class="card"><div class="chead"><h3>${T.chClicks}</h3></div><div class="chart sm"><canvas id="c4"></canvas></div></div>
     <div class="card" id="cmpCard">
       <div class="chead"><h3>${T.compare}</h3></div>
       ${cmpCtl}
       <div id="cmpOut"></div>
     </div>
+    <div class="card help"><div class="chead"><h3>ⓘ ${HELP[lang].title}</h3></div>
+      <dl class="gl">${HELP[lang].items.map(([t,d])=>`<div><dt>${esc(t)}</dt><dd>${esc(d)}</dd></div>`).join('')}</dl></div>
     ${mode==='admin' ? `<div class="card"><div class="chead"><h3>Що система розпізнала в таблиці <small>видно лише вам</small></h3></div><div class="detected">
       ${A.cols.map(o=>`<code>${esc(o.name)}</code> → ${({cost:'витрати',impr:'покази',clicks:'кліки',cpc:'ціна кліку',ctr:'CTR',cpa:'ціна конверсії',total:'всього конверсій',part:'конверсії (кампанія)',value:'цінність конверсій',roas:'ROAS',other:'інше (лише в таблиці)'})[o.role]}`).join(' · ')}
       ${data.some(d=>d.markers.length)?'<br>Позначки: '+data.filter(d=>d.markers.length).map(d=>`<code>${esc(d.markers.join(', '))}</code> перед ${esc(d.label)}`).join(', '):''}
@@ -715,7 +753,7 @@ function drawCompare(){
   const row = (label, va, vb, kind, better, cls='') => {
     const d = delta(va, vb, better);
     return `<tr class="${cls}"><td>${label}</td><td class="a">${fmt(va,kind,cur,lang)}</td><td>${fmt(vb,kind,cur,lang)}</td>
-      <td><span class="pill ${d.ch==null?'neu':(d.cls||'neu')}">${d.ch==null?'—':(d.ch>0?'+':'')+(d.ch*100).toFixed(1)+'%'}</span></td></tr>`;
+      <td><span class="pill ${d.ch==null?'neu':(d.cls||'neu')}">${d.ch==null?'—':(d.ch>0?'+':'')+pf(d.ch*100)+'%'}</span></td></tr>`;
   };
   let html = keys.map(k=>row(T[k], a.v[k], b.v[k], METRIC_FMT[k], BETTER[k])).join('');
   if(A.partNames.length>1){
@@ -749,7 +787,7 @@ function drawCharts(A){
   const {data, partNames} = A;
   const labels = data.map(d=>d.label);
   const mi = data.findIndex(d=>d.markers.length);
-  const mk = {idx: mi>0?mi:null, text: mi>0 ? data[mi].markers[0] : ''};
+  const mk = {idx: mi>0?mi:null, text: mi>0 ? markerLabel(data[mi].markers[0], T) : ''};
   const grid = {color:'#F0F0F3'}, noGrid={display:false};
   const base = () => ({responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false},
     plugins:{legend:{position:'bottom',labels:{boxWidth:10,boxHeight:10,usePointStyle:true}}, markers:mk, tooltip:{backgroundColor:'#1B1B1F',padding:10}},
@@ -765,11 +803,6 @@ function drawCharts(A){
   const o2 = base(); o2.plugins.legend.display=false; o2.scales.y.beginAtZero=false;
   charts.push(new Chart($('#c2'), {type:'line', data:{labels, datasets:[{label:T.cpa, data:data.map(d=>d.v.cpa), borderColor:'#1B1B1F', backgroundColor:'rgba(255,112,97,.10)', fill:true, tension:.35, pointRadius:2.5, pointBackgroundColor:'#FF7061', borderWidth:2.5}]}, options:o2, plugins:[markerPlugin]}));
 
-  const o4 = base();
-  o4.scales = {x:{grid:noGrid,ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:10}}, y:{grid,beginAtZero:true,title:{display:true,text:T.clicks}}, y1:{position:'right',grid:noGrid,beginAtZero:true,title:{display:true,text:T.cost}}};
-  charts.push(new Chart($('#c4'), {type:'bar', data:{labels, datasets:[
-    {label:T.clicks, data:data.map(d=>d.v.clicks), backgroundColor:'#FFC9C1', borderRadius:3, yAxisID:'y'},
-    {label:T.cost, type:'line', data:data.map(d=>d.v.cost), borderColor:'#1B1B1F', pointRadius:0, borderWidth:2, tension:.3, yAxisID:'y1'}]}, options:o4, plugins:[markerPlugin]}));
 }
 
 /* =====================================================================
